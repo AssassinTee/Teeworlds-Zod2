@@ -128,6 +128,12 @@ MACRO_CONFIG_INT(SvVoteKick, sv_vote_kick, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER,
 MACRO_CONFIG_INT(SvVoteKickMin, sv_vote_kick_min, 0, 0, MAX_CLIENTS, CFGFLAG_SAVE|CFGFLAG_SERVER, "Minimum number of players required to start a kick vote")
 MACRO_CONFIG_INT(SvVoteKickBantime, sv_vote_kick_bantime, 5, 0, 1440, CFGFLAG_SAVE|CFGFLAG_SERVER, "The time to ban a player if kicked by vote. 0 makes it just use kick")
 
+//Zomb2
+MACRO_CONFIG_INT(SvZombWarmup, sv_zomb_warmup, 10, 0, 30, CFGFLAG_SERVER, "Number of seconds to do warmup before wave starts")
+MACRO_CONFIG_INT(SvLives, sv_lives, 10, 0, 0, CFGFLAG_SERVER, "Number of the human deaths until the round ends")
+MACRO_CONFIG_INT(SvAllowSpecVote, sv_spec_vote, 0, 1, 1, CFGFLAG_SERVER, "Allow spec voting or not")
+MACRO_CONFIG_INT(SvMaxZombieSpawn, sv_max_zombie_spawn, 1, 100, 20, CFGFLAG_SERVER, "Number of the max spawn tries of all zombies per tick")
+
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 	MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, MAX_CLIENTS-1, CFGFLAG_SERVER, "")
