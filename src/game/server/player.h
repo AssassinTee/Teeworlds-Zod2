@@ -5,6 +5,7 @@
 
 #include "alloc.h"
 
+#define NUM_SUBTYPES 3
 
 enum
 {
@@ -13,13 +14,46 @@ enum
 	WEAPON_WORLD = -1, // death tiles etc
 };
 
+//////////////////
+//1 = Zaby
+//2 = Zoomer
+//3 = Zooker
+//4 = Zamer
+//5 = Zunner
+//6 = Zaster
+//7 = Zotter
+//8 = Zenade
+//9 = Flombie
+//10 = Zinja
+//11 = Zele
+//12 = Zinvis
+//13 = Zeater
+/////////////////
+enum
+{
+    NONE,
+    ZABY=1,
+    ZOOMER=2,
+    ZOOKER=3,
+    ZAMER=4,
+    ZUNNER=5,
+    ZASTER=6,
+    ZOTTER=7,
+    ZENADE=8,
+    FLOMBIE=9,
+    ZINJA=10,
+    ZELE=11,
+    ZINVIS=12,
+    ZEATER=13,
+};
+
 // player object
 class CPlayer
 {
 	MACRO_ALLOC_POOL_ID()
 
 public:
-	CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy);
+	CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, int Zombie);
 	~CPlayer();
 
 	void Init(int CID);
@@ -112,6 +146,14 @@ public:
 		int m_Max;
 	} m_Latency;
 
+    void DeleteCharacter();
+	int GetZomb(){return m_Zombie;}
+	bool GetZomb(int zombie);
+	int GetSubZomb(int i){return m_aSubZomb[i];}
+	void SetSubZomb(int i, int type){m_aSubZomb[i] = type;}
+	const char* GetZombieName(int type);
+	const char* GetZombieSkinName(int type);
+
 private:
 	CCharacter *m_pCharacter;
 	CGameContext *m_pGameServer;
@@ -124,6 +166,10 @@ private:
 	int m_ClientID;
 	int m_Team;
 	bool m_Dummy;
+
+	//Zomb2
+	int m_Zombie;
+	int m_aSubZomb[NUM_SUBTYPES];
 
 	// used for spectator mode
 	int m_SpecMode;

@@ -12,7 +12,7 @@ MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS)
 
 IServer *CPlayer::Server() const { return m_pGameServer->Server(); }
 
-CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy)
+CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, int Zombietype)
 {
 	m_pGameServer = pGameServer;
 	m_RespawnTick = Server()->Tick();
@@ -20,7 +20,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy)
 	m_ScoreStartTick = Server()->Tick();
 	m_pCharacter = 0;
 	m_ClientID = ClientID;
-	m_Team = GameServer()->m_pController->GetStartTeam();
+	m_Team = ClientID < 4 ? TEAM_RED : TEAM_BLUE;//GameServer()->m_pController->GetStartTeam();
 	m_SpecMode = SPEC_FREEVIEW;
 	m_SpectatorID = -1;
 	m_pSpecFlag = 0;
@@ -29,6 +29,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy)
 	m_TeamChangeTick = Server()->Tick();
 	m_InactivityTickCounter = 0;
 	m_Dummy = Dummy;
+	m_Zombie = Zombietype;
 	m_IsReadyToPlay = !GameServer()->m_pController->IsPlayerReadyMode();
 	m_RespawnDisabled = GameServer()->m_pController->GetStartRespawnState();
 	m_DeadSpecMode = false;
@@ -43,12 +44,13 @@ CPlayer::~CPlayer()
 
 void CPlayer::Tick()
 {
-	if(!IsDummy() && !Server()->ClientIngame(m_ClientID))
+	if(!IsDummy() && !Server()->ClientIngame(m_ClientID) && !m_Zombie)
 		return;
 
 	Server()->SetClientScore(m_ClientID, m_Score);
 
 	// do latency stuff
+	if(!m_Zombie)
 	{
 		IServer::CClientInfo Info;
 		if(Server()->GetClientInfo(m_ClientID, &Info))
@@ -136,7 +138,7 @@ void CPlayer::PostTick()
 
 void CPlayer::Snap(int SnappingClient)
 {
-	if(!IsDummy() && !Server()->ClientIngame(m_ClientID))
+	if(!IsDummy() && !Server()->ClientIngame(m_ClientID) && !m_Zombie)
 		return;
 
 	CNetObj_PlayerInfo *pPlayerInfo = static_cast<CNetObj_PlayerInfo *>(Server()->SnapNewItem(NETOBJTYPE_PLAYERINFO, m_ClientID, sizeof(CNetObj_PlayerInfo)));
@@ -152,8 +154,12 @@ void CPlayer::Snap(int SnappingClient)
 		pPlayerInfo->m_PlayerFlags |= PLAYERFLAG_DEAD;
 	if(SnappingClient != -1 && (m_Team == TEAM_SPECTATORS || m_DeadSpecMode) && (SnappingClient == m_SpectatorID))
 		pPlayerInfo->m_PlayerFlags |= PLAYERFLAG_WATCHING;
-
-	pPlayerInfo->m_Latency = SnappingClient == -1 ? m_Latency.m_Min : GameServer()->m_apPlayers[SnappingClient]->m_aActLatency[m_ClientID];
+    if(m_Zombie) {
+        pPlayerInfo->m_Latency = 0;
+    }
+    else {
+        pPlayerInfo->m_Latency = SnappingClient == -1 ? m_Latency.m_Min : GameServer()->m_apPlayers[SnappingClient]->m_aActLatency[m_ClientID];
+    }
 	pPlayerInfo->m_Score = m_Score;
 
 	if(m_ClientID == SnappingClient && (m_Team == TEAM_SPECTATORS || m_DeadSpecMode))
@@ -177,24 +183,41 @@ void CPlayer::Snap(int SnappingClient)
 	}
 
 	// demo recording
-	if(SnappingClient == -1)
+	if(SnappingClient == -1 || m_Zombie)
 	{
 		CNetObj_De_ClientInfo *pClientInfo = static_cast<CNetObj_De_ClientInfo *>(Server()->SnapNewItem(NETOBJTYPE_DE_CLIENTINFO, m_ClientID, sizeof(CNetObj_De_ClientInfo)));
 		if(!pClientInfo)
 			return;
 
-		pClientInfo->m_Local = 0;
-		pClientInfo->m_Team = m_Team;
-		StrToInts(pClientInfo->m_aName, 4, Server()->ClientName(m_ClientID));
-		StrToInts(pClientInfo->m_aClan, 3, Server()->ClientClan(m_ClientID));
-		pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
+        if(m_Zombie)
+        {
+            pClientInfo->m_Local = 0;
+            pClientInfo->m_Team = m_Team;
+            StrToInts(pClientInfo->m_aName, 4, GetZombieName(m_Zombie));
+            StrToInts(pClientInfo->m_aClan, 3, "Zombie");
+            pClientInfo->m_Country = 0;
 
-		for(int p = 0; p < 6; p++)
-		{
-			StrToInts(pClientInfo->m_aaSkinPartNames[p], 6, m_TeeInfos.m_aaSkinPartNames[p]);
-			pClientInfo->m_aUseCustomColors[p] = m_TeeInfos.m_aUseCustomColors[p];
-			pClientInfo->m_aSkinPartColors[p] = m_TeeInfos.m_aSkinPartColors[p];
-		}
+            for(int p = 0; p < 6; p++)
+            {
+                StrToInts(pClientInfo->m_aaSkinPartNames[p], 6, GetZombieSkinName(m_Zombie));
+                pClientInfo->m_aUseCustomColors[p] = 0;
+                pClientInfo->m_aSkinPartColors[p] = 16776960;
+            }
+        }
+        else {
+            pClientInfo->m_Local = 0;
+            pClientInfo->m_Team = m_Team;
+            StrToInts(pClientInfo->m_aName, 4, Server()->ClientName(m_ClientID));
+            StrToInts(pClientInfo->m_aClan, 3, Server()->ClientClan(m_ClientID));
+            pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
+
+            for(int p = 0; p < 6; p++)
+            {
+                StrToInts(pClientInfo->m_aaSkinPartNames[p], 6, m_TeeInfos.m_aaSkinPartNames[p]);
+                pClientInfo->m_aUseCustomColors[p] = m_TeeInfos.m_aUseCustomColors[p];
+                pClientInfo->m_aSkinPartColors[p] = m_TeeInfos.m_aSkinPartColors[p];
+            }
+        }
 	}
 }
 
@@ -328,6 +351,11 @@ void CPlayer::KillCharacter(int Weapon)
 
 void CPlayer::Respawn()
 {
+    if(m_Team == TEAM_BLUE) {
+        m_Spawning = true;
+        return;
+    }
+
 	if(m_RespawnDisabled && m_Team != TEAM_SPECTATORS)
 	{
 		// enable spectate mode for dead players
@@ -469,4 +497,71 @@ void CPlayer::TryRespawn()
 	m_pCharacter = new(m_ClientID) CCharacter(&GameServer()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 	GameServer()->CreatePlayerSpawn(SpawnPos);
+}
+
+bool CPlayer::GetZomb(int Type)
+{
+    if(m_Zombie ==Type)
+        return true;
+    for(int i = 0; i < (int)(NUM_SUBTYPES); ++i)
+    {
+        if(m_aSubZomb[i] == Type)
+            return true;
+    }
+    return false;
+}
+
+
+void CPlayer::DeleteCharacter()
+{
+	if(m_pCharacter)
+	{
+		m_Spawning = false;
+		delete m_pCharacter;
+		m_pCharacter = 0;
+	}
+}
+
+const char* CPlayer::GetZombieName(int type)
+{
+    switch(type)
+    {
+        case ZABY: return "Zaby";
+        case ZOOMER: return "Zoomer";
+        case ZOOKER: return "Zooker";
+        case ZAMER: return "Zamer";
+        case ZUNNER: return "Zunner";
+        case ZASTER: return "Zaster";
+        case ZOTTER: return "Zotter";
+        case ZENADE: return "Zenade";
+        case FLOMBIE: return "Flombie";
+        case ZINJA: return "Zinja";
+        case ZELE: return "Zele";
+        case ZINVIS: return "Zinvis";
+        case ZEATER: return "Zeater";
+        default:
+            return "Unknown";
+    }
+}
+
+const char* CPlayer::GetZombieSkinName(int type)
+{
+    switch(type)
+    {
+        case ZABY: return "zaby";
+        case ZOOMER: return "redstripe";
+        case ZOOKER: return "bluekitty";
+        case ZAMER: return "twinbop";
+        case ZUNNER: return "cammostripes";
+        case ZASTER: return "coala";
+        case ZOTTER: return "cammo";
+        case ZENADE: return "twintri";
+        case FLOMBIE: return "toptri";
+        case ZINJA: return "default";
+        case ZELE: return "redbopp";
+        case ZINVIS: return "zaby";
+        case ZEATER: return "warpaint";
+        default:
+            return "default";
+    }
 }
