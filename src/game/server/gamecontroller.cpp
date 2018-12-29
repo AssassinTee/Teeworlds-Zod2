@@ -50,6 +50,9 @@ IGameController::IGameController(CGameContext *pGameServer)
 	m_aNumSpawnPoints[0] = 0;
 	m_aNumSpawnPoints[1] = 0;
 	m_aNumSpawnPoints[2] = 0;
+
+	m_Wave = 0;
+	mem_zero(m_Zombie, sizeof(m_Zombie));
 }
 
 //activity
@@ -263,9 +266,36 @@ void IGameController::OnCharacterSpawn(CCharacter *pChr)
 		// default health
 		pChr->IncreaseHealth(10);
 
-		// give default weapons
-		pChr->GiveWeapon(WEAPON_HAMMER, -1);
-		pChr->GiveWeapon(WEAPON_GUN, 10);
+		if(pChr->GetPlayer()->GetTeam() == TEAM_RED)
+        {
+            pChr->GiveWeapon(WEAPON_HAMMER, -1);
+            pChr->GiveWeapon(WEAPON_GUN, 10);
+        }
+        else if(pChr->GetPlayer()->GetZomb(ZUNNER) || pChr->GetPlayer()->GetZomb(FLOMBIE))//Zunner, Flombie
+        {
+            pChr->GiveWeapon(WEAPON_GUN, -1);
+            pChr->SetWeapon(WEAPON_GUN);
+        }
+        else if(pChr->GetPlayer()->GetZomb(ZOOMER))//Zoomer
+        {
+            pChr->GiveWeapon(WEAPON_LASER, -1);
+            pChr->SetWeapon(WEAPON_LASER);
+        }
+        else if(pChr->GetPlayer()->GetZomb(ZOTTER))//Zotter
+        {
+            pChr->GiveWeapon(WEAPON_SHOTGUN, -1);
+            pChr->SetWeapon(WEAPON_SHOTGUN);
+        }
+        else if(pChr->GetPlayer()->GetZomb(ZENADE))//Zenade
+        {
+            pChr->GiveWeapon(WEAPON_GRENADE, -1);
+            pChr->SetWeapon(WEAPON_GRENADE);
+        }
+        else//Zaby, Zooker, Zamer, Zaster, Zele, Zinja, Zeater (Ninja gets automatically)
+        {
+            pChr->GiveWeapon(WEAPON_HAMMER, -1);
+            pChr->SetWeapon(WEAPON_HAMMER);
+        }
 	}
 }
 
@@ -398,6 +428,7 @@ void IGameController::CheckReadyStates(int WithoutID)
 		case IGS_START_COUNTDOWN:
 		case IGS_END_MATCH:
 		case IGS_END_ROUND:
+		case IGS_NEXT_WAVE:
 			// not affected
 			break;
 		}
@@ -473,7 +504,7 @@ void IGameController::ResetGame()
 {
 	// reset the game
 	GameServer()->m_World.m_ResetRequested = true;
-	
+
 	SetGameState(IGS_GAME_RUNNING);
 	m_GameStartTick = Server()->Tick();
 	m_SuddenDeath = 0;
@@ -481,7 +512,7 @@ void IGameController::ResetGame()
 	CheckGameInfo();
 
 	// do team-balancing
-	DoTeamBalance();
+	//DoTeamBalance();
 }
 
 void IGameController::SetGameState(EGameState GameState, int Timer)
@@ -498,7 +529,7 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 				// run warmup till there're enough players
 				m_GameState = GameState;
  				m_GameStateTimer = TIMER_INFINITE;
-		
+
 				// enable respawning in survival when activating warmup
 				if(m_GameFlags&GAMEFLAG_SURVIVAL)
 				{
@@ -537,14 +568,14 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 					m_GameState = GameState;
 					m_GameStateTimer = Timer*Server()->TickSpeed();
 				}
-		
+
 				// enable respawning in survival when activating warmup
-				if(m_GameFlags&GAMEFLAG_SURVIVAL)
+				/*if(m_GameFlags&GAMEFLAG_SURVIVAL)
 				{
 					for(int i = 0; i < MAX_CLIENTS; ++i)
 						if(GameServer()->m_apPlayers[i])
 							GameServer()->m_apPlayers[i]->m_RespawnDisabled = false;
-				}
+				}*/
 			}
 			else
 			{
@@ -611,9 +642,15 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 			m_GameState = GameState;
 			m_GameStateTimer = Timer*Server()->TickSpeed();
 			m_SuddenDeath = 0;
-			GameServer()->m_World.m_Paused = true;
+			//GameServer()->m_World.m_Paused = true;
 		}
-	}
+	case IGS_NEXT_WAVE:
+        if(m_GameState == IGS_GAME_RUNNING)
+        {
+            m_GameState = GameState;
+            m_GameStateTimer = g_Config.m_SvZombWarmup*Server()->TickSpeed();
+        }
+    }
 }
 
 void IGameController::StartMatch()
@@ -625,15 +662,21 @@ void IGameController::StartMatch()
 	m_aTeamscore[TEAM_BLUE] = 0;
 
 	// start countdown if there're enough players, otherwise do warmup till there're
-	if(HasEnoughPlayers())
-		SetGameState(IGS_START_COUNTDOWN);
-	else
-		SetGameState(IGS_WARMUP_GAME, TIMER_INFINITE);
+	//if(HasEnoughPlayers())
+    SetGameState(IGS_START_COUNTDOWN);
+	//else
+    //SetGameState(IGS_WARMUP_GAME, TIMER_INFINITE);
 
 	Server()->DemoRecorder_HandleAutoStart();
+
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "start match type='%s' teamplay='%d'", m_pGameType, m_GameFlags&GAMEFLAG_TEAMS);
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+
+    for(int i = 4; i < MAX_CLIENTS; i++)//bugfix
+        GameServer()->OnZombieKill(i);
+    m_Wave++;
+    StartWave(m_Wave);
 }
 
 void IGameController::StartRound()
@@ -643,10 +686,13 @@ void IGameController::StartRound()
 	++m_RoundCount;
 
 	// start countdown if there're enough players, otherwise abort to warmup
-	if(HasEnoughPlayers())
-		SetGameState(IGS_START_COUNTDOWN);
-	else
-		SetGameState(IGS_WARMUP_GAME, TIMER_INFINITE);
+	//if(HasEnoughPlayers())
+    //SetGameState(IGS_START_COUNTDOWN);
+	//else
+    //SetGameState(IGS_WARMUP_GAME, TIMER_INFINITE);
+
+
+
 }
 
 // general
@@ -688,6 +734,11 @@ void IGameController::Snap(int SnappingClient)
 	case IGS_GAME_RUNNING:
 		// not effected
 		break;
+    case IGS_NEXT_WAVE:
+        pGameData->m_GameStateFlags |= GAMESTATEFLAG_WARMUP;
+        if(m_GameStateTimer != TIMER_INFINITE)
+			pGameData->m_GameStateEndTick = Server()->Tick()+m_GameStateTimer;
+        break;
 	}
 	if(m_SuddenDeath)
 		pGameData->m_GameStateFlags |= GAMESTATEFLAG_SUDDENDEATH;
@@ -755,7 +806,13 @@ void IGameController::Tick()
 			case IGS_GAME_RUNNING:
 				// not effected
 				break;
-			}
+            case IGS_NEXT_WAVE:
+				// unpause the game
+                m_Wave++;
+                StartWave(m_Wave);
+				SetGameState(IGS_GAME_RUNNING);
+				break;
+            }
 		}
 		else
 		{
@@ -778,6 +835,7 @@ void IGameController::Tick()
 			case IGS_GAME_RUNNING:
 			case IGS_END_MATCH:
 			case IGS_END_ROUND:
+			case IGS_NEXT_WAVE:
 				// not effected
 				break;
  			}
@@ -785,7 +843,9 @@ void IGameController::Tick()
 	}
 
 	// do team-balancing (skip this in survival, done there when a round starts)
-	if(IsTeamplay() && !(m_GameFlags&GAMEFLAG_SURVIVAL))
+
+	//Zomb2
+	/*if(IsTeamplay() && !(m_GameFlags&GAMEFLAG_SURVIVAL))
 	{
 		switch(m_UnbalancedTick)
 		{
@@ -798,7 +858,9 @@ void IGameController::Tick()
 			if(Server()->Tick() > m_UnbalancedTick+g_Config.m_SvTeambalanceTime*Server()->TickSpeed()*60)
 				DoTeamBalance();
 		}
-	}
+	}*/
+
+
 
 	// check for inactive players
 	DoActivityCheck();
@@ -806,6 +868,7 @@ void IGameController::Tick()
 	// win check
 	if((m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_GAME_PAUSED) && !GameServer()->m_World.m_ResetRequested)
 	{
+        CheckZombie();
 		if(m_GameFlags&GAMEFLAG_SURVIVAL)
 			DoWincheckRound();
 		else
@@ -867,7 +930,7 @@ void IGameController::UpdateGameInfo(int ClientID)
 
 	if(ClientID == -1)
 	{
-		for(int i = 0; i < MAX_CLIENTS; ++i)
+		for(int i = 0; i < 4; ++i)
 		{
 			if(!GameServer()->m_apPlayers[i] || !Server()->ClientIngame(i))
 				continue;
@@ -1170,4 +1233,202 @@ int IGameController::GetStartTeam()
 		return Team;
 	}
 	return TEAM_SPECTATORS;
+}
+
+void IGameController::StartWave(int Wave)
+{
+	if(!Wave)//Well, just in case ^^ shouldn't be needed
+		return;
+	//Zaby, Zaby has no alround wave
+	else if(Wave == 1)
+		m_Zombie[0] = 10;
+	else if(Wave == 2)
+		m_Zombie[0] = 40;
+	else
+		SetWaveAlg(Wave%3, Wave/3);
+
+	//Message Shit
+	m_ZombLeft = 0;
+	for(int i = 0; i < (int)(sizeof(m_Zombie)/sizeof(m_Zombie[0])); i++)
+		m_ZombLeft += m_Zombie[i];
+
+	DoZombMessage(0);
+}
+
+void IGameController::CheckZombie()
+{
+	if(m_GameState == IGS_WARMUP_GAME || m_GameState == IGS_WARMUP_USER || !m_Wave || EndWave())
+		return;
+	for(int i = 4; i < 64; i++)//i = 4, 0 a. 1 a. 2 a. 3 reserved
+	{
+		if(!GameServer()->m_apPlayers[i])//Check if the CID is free
+		{
+			int Random = RandZomb();
+			if(Random == -1)
+				break;
+			GameServer()->OnZombie(i, Random+1);//Create a Zombie Finally
+			m_Zombie[Random]--;
+		}
+	}
+}
+
+int IGameController::RandZomb()
+{
+	int size = (int)(sizeof(m_Zombie)/sizeof(m_Zombie[0]));
+	int Rand = rand()%size;
+	int WTF = g_Config.m_SvMaxZombieSpawn;//dont make it to high, can cause bad cpu
+	while(!m_Zombie[Rand])
+	{
+		Rand = rand()%size;
+		WTF--;
+		if(!WTF) // Anti 100% CPU :D (Very crappy, but it's a fix :P)
+			return -1;
+	}
+	return Rand;
+}
+
+bool IGameController::EndWave()
+{
+    int k;
+	for(k = 0; k < 4; k++)
+	{
+		if(GameServer()->m_apPlayers[k])//Make sure a player is there
+		{
+            k = -1;
+            break;
+		}
+	}
+	if(k != -1) {
+        for(int i = 4; i < 64; i++)
+            GameServer()->OnZombieKill(i);
+        //HandleTop();
+        m_Wave = 0;
+        return true;
+    }
+	for(int j = 0; j < (int)(sizeof(m_Zombie)/sizeof(m_Zombie[0])); j++)
+	{
+		if(m_Zombie[j])
+			return false;
+	}
+	for(int i = 4; i < 64; i++)
+	{
+		if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS)
+			return false;
+	}
+	/*if(m_GameState != IGS_START_COUNTDOWN) {
+        SetGameState(IGS_START_COUNTDOWN, g_Config.m_SvZombWarmup);
+    }*/
+    //DoWarmup(g_Config.m_SvZombWarmup);
+    //StartMatch();
+    SetGameState(IGS_NEXT_WAVE, g_Config.m_SvZombWarmup);
+    //SetGameState(IGS_END_ROUND, g_Config.m_SvZombWarmup);
+	return true;
+}
+
+void IGameController::DoZombMessage(int Which)
+{
+	char aBuf[64];
+	if(!Which)
+	{
+		str_format(aBuf, sizeof(aBuf), "Wave %d started with %d Zombies!", m_Wave, m_ZombLeft);
+		GameServer()->SendBroadcast(aBuf, -1);
+		return;
+	}
+	Which -= 1;
+	if(Which > 1 && (Which <= 5 || !(Which%10)))
+	{
+		str_format(aBuf, sizeof(aBuf), "Wave %d: %d zombies are left", m_Wave, Which);
+		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+	}
+	else if(Which == 1)
+	{
+		str_format(aBuf, sizeof(aBuf), "Wave %d: 1 zombie is left", m_Wave);
+		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+	}
+}
+
+void IGameController::DoLifeMessage(int Life)
+{
+	char aBuf[64];
+	Life -= 1;
+
+	if(Life > 1 && (Life <= 5 || !(Life%10)))
+	{
+		if(Life <= 10)
+		{
+			str_format(aBuf, sizeof(aBuf), "Only %d lifes left!", Life);
+			GameServer()->SendBroadcast(aBuf, -1);
+			GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+		}
+		else
+		{
+			str_format(aBuf, sizeof(aBuf), "%d lifes left!", Life);
+			GameServer()->SendBroadcast(aBuf, -1);
+			GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+		}
+	}
+	else if(Life == 1)
+	{
+		str_format(aBuf, sizeof(aBuf), "!!!Only 1 life left!!!", Life);
+		GameServer()->SendBroadcast(aBuf, -1);
+		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+	}
+
+}
+
+void IGameController::SetWaveAlg(int modulus, int wavedrittel)
+{
+	if(wavedrittel > 11)//endless Waves, but exponentiell Zombie code
+	{
+		for(int i = 0; i < (int)(sizeof(m_Zombie)/sizeof(m_Zombie[0])); i++)
+			m_Zombie[i] = m_Wave - 35;//3 mal wavedrittel + modulus 2
+		return;
+	}
+
+	if(!modulus)//10ner Wave
+	{
+		m_Zombie[GetZombieReihenfolge(wavedrittel)] = 10;
+	}
+	else if(modulus == 1)//40er wave
+	{
+		m_Zombie[GetZombieReihenfolge(wavedrittel)] = 40;
+	}
+	else if(modulus == 2)
+	{
+		for(int i = 0; i <= wavedrittel; i++)
+		{
+			m_Zombie[GetZombieReihenfolge(i)] = 10;
+		}
+	}
+}
+
+int IGameController::GetZombieReihenfolge(int wavedrittel)//Was heißt Riehenfolge auf englisch ...
+{
+	//sehr unschön, man müsste die Zombies neu sortieren was ein haufen arbeit ist
+	if(!wavedrittel)
+		return 0;
+	else if(wavedrittel == 1)
+		return 2;
+	else if(wavedrittel == 2)
+		return 3;
+	else if(wavedrittel == 3)
+		return 4;
+	else if(wavedrittel == 4)
+		return 6;
+	else if(wavedrittel == 5)
+		return 5;
+	else if(wavedrittel == 6)
+		return 7;
+	else if(wavedrittel == 7)
+		return 8;
+	else if(wavedrittel == 8)
+		return 9;
+	else if(wavedrittel == 9)
+		return 10;
+	else if(wavedrittel == 10)
+		return 11;
+	else if(wavedrittel == 11)
+		return 1;
+	else//shouldnt be needed
+		return 0;
 }

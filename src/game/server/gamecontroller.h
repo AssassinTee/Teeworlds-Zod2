@@ -47,9 +47,10 @@ class IGameController
 
 		IGS_GAME_PAUSED,		// game paused (infinite or tick timer)
 		IGS_GAME_RUNNING,		// game running (infinite)
-		
+
 		IGS_END_MATCH,			// match is over (tick timer)
 		IGS_END_ROUND,			// round is over (tick timer)
+		IGS_NEXT_WAVE,          //zomb2 fuck it I do my own game state!!! State: Warmup for next wave
  	};
 	EGameState m_GameState;
 	int m_GameStateTimer;
@@ -64,7 +65,7 @@ class IGameController
 
 	// map
 	char m_aMapWish[128];
-	
+
 	void CycleMap();
 
 	// spawn
@@ -84,7 +85,7 @@ class IGameController
 	};
 	vec2 m_aaSpawnPoints[3][64];
 	int m_aNumSpawnPoints[3];
-	
+
 	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const;
 	void EvaluateSpawnType(CSpawnEval *pEval, int Type) const;
 
@@ -117,6 +118,9 @@ protected:
 	} m_GameInfo;
 
 	void UpdateGameInfo(int ClientID);
+
+    //Zomb2
+    int m_NoCheatLife;
 
 public:
 	IGameController(class CGameContext *pGameServer);
@@ -194,9 +198,9 @@ public:
 	bool IsPlayerReadyMode() const;
 	bool IsTeamChangeAllowed() const;
 	bool IsTeamplay() const { return m_GameFlags&GAMEFLAG_TEAMS; }
-	
+
 	const char *GetGameType() const { return m_pGameType; }
-	
+
 	// map
 	void ChangeMap(const char *pToMap);
 
@@ -210,9 +214,28 @@ public:
 
 	void DoTeamChange(class CPlayer *pPlayer, int Team, bool DoChatMsg=true);
 	void ForceTeamBalance() { if(!(m_GameFlags&GAMEFLAG_SURVIVAL)) DoTeamBalance(); }
-	
+
 	int GetRealPlayerNum() const { return m_aTeamSize[TEAM_RED]+m_aTeamSize[TEAM_BLUE]; }
 	int GetStartTeam();
+
+	//Zomb2
+	int m_Wave;
+	int m_Zombie[13];//not sure about the amount of zombies
+	int m_ZombLeft;
+
+	void StartWave(int Wave);
+	void CheckZombie();
+	int RandZomb();
+	bool EndWave();
+	void DoZombMessage(int Which);
+	void DoLifeMessage(int Life);
+	void HandleTop();
+	void SetWaveAlg(int modulus, int wavedrittel);
+	int GetZombieReihenfolge(int wavedrittel);
+
+	//int m_aTeamscore[2];//To set the new round in gamecontext
+    int GetConfigLife() {return m_NoCheatLife; }
+    void SetTeamscore(int team, int score){m_aTeamscore[team] = score;}
 };
 
 #endif
