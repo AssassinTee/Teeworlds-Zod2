@@ -593,14 +593,12 @@ void CGameContext::OnClientEnter(int ClientID)
 {
     if(ClientID >=4)
         return;
-    /*if(!m_pController->m_Wave)
+    if(!m_pController->m_Wave)
     {
-        m_pController->DoWarmup(0);
-        m_pController->SetTeamscore(TEAM_RED, 0);
-        m_pController->SetTeamscore(TEAM_BLUE, g_Config.m_SvLives);
-        //m_pController->m_aTeamscore[TEAM_RED] = 0;
-        //m_pController->m_aTeamscore[TEAM_BLUE] = g_Config.m_SvLives;
-    }*/
+
+        m_pController->SetTeamscore(TEAM_BLUE, 0);
+        m_pController->SetTeamscore(TEAM_RED, g_Config.m_SvLives);
+    }
 
 	m_pController->OnPlayerConnect(m_apPlayers[ClientID]);
 
@@ -715,24 +713,29 @@ void CGameContext::OnZombie(int ClientID, int Zomb)
 
 void CGameContext::OnZombieKill(int ClientID)
 {
-    if(ClientID < 4) {
-        return;
+    if(ClientID >= 4) {
+
+        //Send fucking netmessage
+        CNetMsg_Sv_ClientDrop Msg;
+        Msg.m_ClientID = ClientID;
+        Msg.m_pReason = "";
+        Msg.m_Silent = true;
+
+        Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
+        if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetCharacter())
+            m_apPlayers[ClientID]->DeleteCharacter();
+
+        if(m_apPlayers[ClientID])
+            delete m_apPlayers[ClientID];
+
+        m_apPlayers[ClientID] = 0;
+        m_pController->DescreaseZombLeft();
     }
-
-    //Send fucking netmessage
-    CNetMsg_Sv_ClientDrop Msg;
-    Msg.m_ClientID = ClientID;
-    Msg.m_pReason = "";
-    Msg.m_Silent = true;
-
-    Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
-	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetCharacter())
-		m_apPlayers[ClientID]->DeleteCharacter();
-
-	if(m_apPlayers[ClientID])
-		delete m_apPlayers[ClientID];
-
-	m_apPlayers[ClientID] = 0;
+    else
+    {
+        m_pController->SetTeamscore(TEAM_RED, m_pController->GetTeamscore(TEAM_RED)-1);
+        m_pController->DoLifeMessage(m_pController->GetTeamscore(TEAM_RED));
+    }
 	// update spectator modes
 	/*for(int i = 0; i < 4; ++i)
 	{
@@ -749,8 +752,8 @@ void CGameContext::OnClientConnected(int ClientID, bool Dummy)
     if(!m_pController->m_Wave)//let the round start
 	{
 		m_pController->DoWarmup(g_Config.m_SvWarmup);
-		m_pController->SetTeamscore(TEAM_RED, 0);
-		m_pController->SetTeamscore(TEAM_BLUE, g_Config.m_SvLives);
+		m_pController->SetTeamscore(TEAM_BLUE, 0);
+		m_pController->SetTeamscore(TEAM_RED, g_Config.m_SvLives);
     }
 
 	m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, Dummy, 0);
