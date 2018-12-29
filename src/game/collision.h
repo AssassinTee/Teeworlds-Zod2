@@ -34,6 +34,12 @@ public:
 	void MovePoint(vec2 *pInoutPos, vec2 *pInoutVel, float Elasticity, int *pBounces) const;
 	void MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elasticity) const;
 	bool TestBox(vec2 Pos, vec2 Size) const;
+
+	//Zomb2
+	bool CheckTiles(vec2 Pos, int Deepness);
+	bool CheckParable(vec2 Pos, int Wideness, int Direction);
+	bool CheckPlatform(vec2 Pos, int Deepness);
+    bool IntersectTile(vec2 Pos0, vec2 Pos1);
 };
 
 #endif
