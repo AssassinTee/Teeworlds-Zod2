@@ -12,12 +12,12 @@
 #include <game/version.h>
 
 #include "entities/character.h"
-#include "gamemodes/ctf.h"
-#include "gamemodes/dm.h"
+#include "gamemodes/zod.h"
+/*#include "gamemodes/dm.h"
 #include "gamemodes/lms.h"
 #include "gamemodes/lts.h"
 #include "gamemodes/mod.h"
-#include "gamemodes/tdm.h"
+#include "gamemodes/tdm.h"*/
 #include "gamecontext.h"
 #include "player.h"
 
@@ -255,9 +255,12 @@ void CGameContext::SendEmoticon(int ClientID, int Emoticon)
 
 void CGameContext::SendWeaponPickup(int ClientID, int Weapon)
 {
-	CNetMsg_Sv_WeaponPickup Msg;
-	Msg.m_Weapon = Weapon;
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+    if(!m_apPlayers[ClientID]->GetZomb())//Zombies don't pickup weapons
+    {
+        CNetMsg_Sv_WeaponPickup Msg;
+        Msg.m_Weapon = Weapon;
+        Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+    }
 }
 
 void CGameContext::SendMotd(int ClientID)
@@ -588,6 +591,17 @@ void CGameContext::OnClientPredictedInput(int ClientID, void *pInput)
 
 void CGameContext::OnClientEnter(int ClientID)
 {
+    if(ClientID >=4)
+        return;
+    /*if(!m_pController->m_Wave)
+    {
+        m_pController->DoWarmup(0);
+        m_pController->SetTeamscore(TEAM_RED, 0);
+        m_pController->SetTeamscore(TEAM_BLUE, g_Config.m_SvLives);
+        //m_pController->m_aTeamscore[TEAM_RED] = 0;
+        //m_pController->m_aTeamscore[TEAM_BLUE] = g_Config.m_SvLives;
+    }*/
+
 	m_pController->OnPlayerConnect(m_apPlayers[ClientID]);
 
 	m_VoteUpdate = true;
@@ -613,7 +627,7 @@ void CGameContext::OnClientEnter(int ClientID)
 	}
 
 
-	for(int i = 0; i < MAX_CLIENTS; ++i)
+	for(int i = 0; i < 4; ++i)
 	{
 		if(i == ClientID || !m_apPlayers[i] || (!Server()->ClientIngame(i) && !m_apPlayers[i]->IsDummy()))
 			continue;
@@ -653,9 +667,93 @@ void CGameContext::OnClientEnter(int ClientID)
 	}
 }
 
+void CGameContext::OnZombie(int ClientID, int Zomb)
+{
+    char bBuf[128];
+    str_format(bBuf, sizeof(bBuf), "Create zombie of type '%d'", Zomb);
+    Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", bBuf);
+	if(ClientID >= 64) //|| //m_apPlayers[ClientID])
+			return;
+    m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, false, Zomb);
+	m_apPlayers[ClientID]->Respawn();
+
+    CNetMsg_Sv_ClientInfo NewClientInfoMsg;
+	NewClientInfoMsg.m_ClientID = ClientID;
+	NewClientInfoMsg.m_Local = 0;
+	NewClientInfoMsg.m_Team = m_apPlayers[ClientID]->GetTeam();
+	NewClientInfoMsg.m_pName = m_apPlayers[ClientID]->GetZombieName(Zomb);
+
+    str_format(bBuf, sizeof(bBuf), "Zombiename '%s'", m_apPlayers[ClientID]->GetZombieName(Zomb));
+    Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", bBuf);
+
+	NewClientInfoMsg.m_pClan = "Zombie";
+	NewClientInfoMsg.m_Country = 0;
+	NewClientInfoMsg.m_Silent = true;
+
+	if(g_Config.m_SvSilentSpectatorMode && m_apPlayers[ClientID]->GetTeam() == TEAM_SPECTATORS)
+		NewClientInfoMsg.m_Silent = true;
+
+    for(int p = 0; p < 6; p++)
+	{
+		NewClientInfoMsg.m_apSkinPartNames[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aaSkinPartNames[p];
+		NewClientInfoMsg.m_aUseCustomColors[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aUseCustomColors[p];
+		NewClientInfoMsg.m_aSkinPartColors[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aSkinPartColors[p];
+	}
+
+    for(int i = 0; i < 4; ++i)
+	{
+		if(i == ClientID || !m_apPlayers[i] || (!Server()->ClientIngame(i) && !m_apPlayers[i]->IsDummy()))
+			continue;
+        char aBuf[128];
+        str_format(aBuf, sizeof(aBuf), "Send zombie info on '%d'", i);
+        Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", aBuf);
+		// new info for others
+		if(Server()->ClientIngame(i))
+			Server()->SendPackMsg(&NewClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
+	}
+}
+
+void CGameContext::OnZombieKill(int ClientID)
+{
+    if(ClientID < 4) {
+        return;
+    }
+
+    //Send fucking netmessage
+    CNetMsg_Sv_ClientDrop Msg;
+    Msg.m_ClientID = ClientID;
+    Msg.m_pReason = "";
+    Msg.m_Silent = true;
+
+    Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
+	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetCharacter())
+		m_apPlayers[ClientID]->DeleteCharacter();
+
+	if(m_apPlayers[ClientID])
+		delete m_apPlayers[ClientID];
+
+	m_apPlayers[ClientID] = 0;
+	// update spectator modes
+	/*for(int i = 0; i < 4; ++i)
+	{
+		if(m_apPlayers[i] && m_apPlayers[i]->GetSpectatorID() == ClientID)
+			m_apPlayers[i]->SetSpectatorID(SPEC_FREEVIEW, -1);
+	}*/
+}
+
 void CGameContext::OnClientConnected(int ClientID, bool Dummy)
 {
-	m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, Dummy);
+    if(ClientID >= 4)
+        return;
+
+    if(!m_pController->m_Wave)//let the round start
+	{
+		m_pController->DoWarmup(g_Config.m_SvWarmup);
+		m_pController->SetTeamscore(TEAM_RED, 0);
+		m_pController->SetTeamscore(TEAM_BLUE, g_Config.m_SvLives);
+    }
+
+	m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, Dummy, 0);
 
 	if(Dummy)
 		return;
@@ -1429,7 +1527,7 @@ void CGameContext::OnInit()
 	m_Collision.Init(&m_Layers);
 
 	// select gametype
-	if(str_comp_nocase(g_Config.m_SvGametype, "mod") == 0)
+	/*if(str_comp_nocase(g_Config.m_SvGametype, "mod") == 0)
 		m_pController = new CGameControllerMOD(this);
 	else if(str_comp_nocase(g_Config.m_SvGametype, "ctf") == 0)
 		m_pController = new CGameControllerCTF(this);
@@ -1440,7 +1538,9 @@ void CGameContext::OnInit()
 	else if(str_comp_nocase(g_Config.m_SvGametype, "tdm") == 0)
 		m_pController = new CGameControllerTDM(this);
 	else
-		m_pController = new CGameControllerDM(this);
+		m_pController = new CGameControllerDM(this);*/
+
+    m_pController = new CGameControllerZOD(this);
 
 	// create all entities from the game layer
 	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();

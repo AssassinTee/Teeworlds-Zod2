@@ -176,6 +176,10 @@ public:
 	virtual const char *GameType() const;
 	virtual const char *Version() const;
 	virtual const char *NetVersion() const;
+
+		//Zomb2
+	void OnZombie(int ClientID, int Zomb);
+    void OnZombieKill(int ClientID);
 };
 
 inline int64 CmaskAll() { return -1; }
