@@ -120,7 +120,7 @@ protected:
 	void UpdateGameInfo(int ClientID);
 
     //Zomb2
-    int m_NoCheatLife;
+    //int m_NoCheatLife;
 
 public:
 	IGameController(class CGameContext *pGameServer);
@@ -234,8 +234,10 @@ public:
 	int GetZombieReihenfolge(int wavedrittel);
 
 	//int m_aTeamscore[2];//To set the new round in gamecontext
-    int GetConfigLife() {return m_NoCheatLife; }
+    //int GetConfigLife() {return m_NoCheatLife; }
+    void DescreaseZombLeft() {m_ZombLeft--;}
     void SetTeamscore(int team, int score){m_aTeamscore[team] = score;}
+    int GetTeamscore(int team) {return m_aTeamscore[team];}
 };
 
 #endif

@@ -460,14 +460,8 @@ void IGameController::DoWincheckMatch()
 	if(IsTeamplay())
 	{
 		// check score win condition
-		if((m_GameInfo.m_ScoreLimit > 0 && (m_aTeamscore[TEAM_RED] >= m_GameInfo.m_ScoreLimit || m_aTeamscore[TEAM_BLUE] >= m_GameInfo.m_ScoreLimit)) ||
-			(m_GameInfo.m_TimeLimit > 0 && (Server()->Tick()-m_GameStartTick) >= m_GameInfo.m_TimeLimit*Server()->TickSpeed()*60))
-		{
-			if(m_aTeamscore[TEAM_RED] != m_aTeamscore[TEAM_BLUE] || m_GameFlags&GAMEFLAG_SURVIVAL)
-				EndMatch();
-			else
-				m_SuddenDeath = 1;
-		}
+		if(m_aTeamscore[TEAM_RED] == 0)
+            EndMatch();
 	}
 	else
 	{
@@ -658,7 +652,7 @@ void IGameController::StartMatch()
 	ResetGame();
 
 	m_RoundCount = 0;
-	m_aTeamscore[TEAM_RED] = 0;
+	m_aTeamscore[TEAM_RED] = g_Config.m_SvLives;
 	m_aTeamscore[TEAM_BLUE] = 0;
 
 	// start countdown if there're enough players, otherwise do warmup till there're
@@ -675,7 +669,8 @@ void IGameController::StartMatch()
 
     for(int i = 4; i < MAX_CLIENTS; i++)//bugfix
         GameServer()->OnZombieKill(i);
-    m_Wave++;
+    m_aTeamscore[TEAM_RED] = g_Config.m_SvLives;
+    m_Wave=1;
     StartWave(m_Wave);
 }
 
@@ -687,7 +682,7 @@ void IGameController::StartRound()
 
 	// start countdown if there're enough players, otherwise abort to warmup
 	//if(HasEnoughPlayers())
-    //SetGameState(IGS_START_COUNTDOWN);
+    SetGameState(IGS_START_COUNTDOWN);
 	//else
     //SetGameState(IGS_WARMUP_GAME, TIMER_INFINITE);
 
@@ -749,7 +744,8 @@ void IGameController::Snap(int SnappingClient)
 		if(!pGameDataTeam)
 			return;
 
-		pGameDataTeam->m_TeamscoreRed = m_aTeamscore[TEAM_RED];
+		m_aTeamscore[TEAM_BLUE] = m_ZombLeft;
+        pGameDataTeam->m_TeamscoreRed = m_aTeamscore[TEAM_RED];
 		pGameDataTeam->m_TeamscoreBlue = m_aTeamscore[TEAM_BLUE];
 	}
 
@@ -1350,8 +1346,6 @@ void IGameController::DoZombMessage(int Which)
 void IGameController::DoLifeMessage(int Life)
 {
 	char aBuf[64];
-	Life -= 1;
-
 	if(Life > 1 && (Life <= 5 || !(Life%10)))
 	{
 		if(Life <= 10)
