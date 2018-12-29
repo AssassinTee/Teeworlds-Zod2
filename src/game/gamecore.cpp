@@ -72,6 +72,9 @@ void CCharacterCore::Reset()
 	m_HookedPlayer = -1;
 	m_Jumped = 0;
 	m_TriggeredEvents = 0;
+
+	//Zomb2
+	m_Zooker = false;
 }
 
 void CCharacterCore::Tick(bool UseInput)
@@ -283,7 +286,7 @@ void CCharacterCore::Tick(bool UseInput)
 
 		// release hook (max hook time is 1.25
 		m_HookTick++;
-		if(m_HookedPlayer != -1 && (m_HookTick > SERVER_TICK_SPEED+SERVER_TICK_SPEED/5 || !m_pWorld->m_apCharacters[m_HookedPlayer]))
+		if(m_HookedPlayer != -1 && !m_Zooker && (m_HookTick > SERVER_TICK_SPEED+SERVER_TICK_SPEED/5 || !m_pWorld->m_apCharacters[m_HookedPlayer]))
 		{
 			m_HookedPlayer = -1;
 			m_HookState = HOOK_RETRACTED;
