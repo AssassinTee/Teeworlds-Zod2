@@ -545,8 +545,9 @@ void CCharacter::Tick()
 
     //Zomb2
     DoZombieMovement();
-    if(!IsAlive())//Boomer kills himself
+    if(!IsAlive()) {//Boomer kills himself
         return;
+    }
 
 
 
@@ -705,14 +706,19 @@ void CCharacter::Die(int Killer, int Weapon)
 
 bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 {
-    if(Weapon == WEAPON_GRENADE || (GameServer()->m_apPlayers[From] && GameServer()->m_apPlayers[From]->GetTeam() == TEAM_RED))
-        m_Core.m_Vel += Force;
+    if(!m_pPlayer || (m_pPlayer->GetZomb(ZAMER) && From == m_pPlayer->GetCID()))
+        return false;
 
-	if(!m_pPlayer || m_Aim.m_Explode || GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From))
+    if(m_pPlayer->GetTeam() == TEAM_RED) {
+        m_Core.m_Vel += Force;
+    }
+
+    if(GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From)) {
 		return false;
+    }
 
     //Force
-	if (GameServer()->m_apPlayers[From] && GameServer()->m_apPlayers[From]->GetTeam() == TEAM_RED) {
+	if (m_pPlayer->GetTeam() == TEAM_BLUE) {
 		vec2 AddVel = vec2(0, 0);
 		if (Weapon == WEAPON_HAMMER)
 			AddVel = Force*0.7f;
@@ -1045,10 +1051,10 @@ void CCharacter::DoZombieAim(vec2 VictimPos, int VicCID, vec2 NearZombPos, int N
 		if(m_pPlayer->GetZomb(4))
 		{
 			m_Aim.m_Explode = true;
-			GameServer()->CreateExplosion(vec2(m_Pos.x + 5, m_Pos.y + 5), m_pPlayer->GetCID(), WEAPON_GAME, false);
-			GameServer()->CreateExplosion(vec2(m_Pos.x - 5, m_Pos.y + 5), m_pPlayer->GetCID(), WEAPON_GAME, false);
-			GameServer()->CreateExplosion(vec2(m_Pos.x - 5, m_Pos.y - 5), m_pPlayer->GetCID(), WEAPON_GAME, false);
-			GameServer()->CreateExplosion(vec2(m_Pos.x + 5, m_Pos.y - 5), m_pPlayer->GetCID(), WEAPON_GAME, false);
+			GameServer()->CreateExplosion(vec2(m_Pos.x + 5, m_Pos.y + 5), m_pPlayer->GetCID(), WEAPON_GAME, g_pData->m_Weapons.m_Grenade.m_pBase->m_Damage);
+			GameServer()->CreateExplosion(vec2(m_Pos.x - 5, m_Pos.y + 5), m_pPlayer->GetCID(), WEAPON_GAME, g_pData->m_Weapons.m_Grenade.m_pBase->m_Damage);
+			GameServer()->CreateExplosion(vec2(m_Pos.x - 5, m_Pos.y - 5), m_pPlayer->GetCID(), WEAPON_GAME, g_pData->m_Weapons.m_Grenade.m_pBase->m_Damage);
+			GameServer()->CreateExplosion(vec2(m_Pos.x + 5, m_Pos.y - 5), m_pPlayer->GetCID(), WEAPON_GAME, g_pData->m_Weapons.m_Grenade.m_pBase->m_Damage);
 			for(int i = 0; i < 100; i++)
 				GameServer()->CreateSound(vec2(m_Pos.x + 5, m_Pos.y + 5), SOUND_GRENADE_EXPLODE, -1);
 			Die(m_pPlayer->GetCID(), WEAPON_SELF);
