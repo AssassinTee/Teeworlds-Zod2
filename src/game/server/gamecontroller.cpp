@@ -636,7 +636,7 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 			m_GameState = GameState;
 			m_GameStateTimer = Timer*Server()->TickSpeed();
 			m_SuddenDeath = 0;
-			//GameServer()->m_World.m_Paused = true;
+			GameServer()->m_World.m_Paused = true;
 		}
 	case IGS_NEXT_WAVE:
         if(m_GameState == IGS_GAME_RUNNING)
@@ -1236,12 +1236,15 @@ void IGameController::StartWave(int Wave)
 	if(!Wave)//Well, just in case ^^ shouldn't be needed
 		return;
 	//Zaby, Zaby has no alround wave
-	else if(Wave == 1)
+	/*else if(Wave == 1)
 		m_Zombie[0] = 10;
 	else if(Wave == 2)
 		m_Zombie[0] = 40;
 	else
-		SetWaveAlg(Wave%3, Wave/3);
+		SetWaveAlg(Wave%3, Wave/3);*/
+    for(int i = 0; i < ZEATER-1; i++)
+        m_Zombie[i] = 2;
+    //m_Zombie[ZAMER-1] = 5;
 
 	//Message Shit
 	m_ZombLeft = 0;
