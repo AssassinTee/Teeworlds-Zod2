@@ -34,6 +34,11 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, int Zombie
 	m_RespawnDisabled = GameServer()->m_pController->GetStartRespawnState();
 	m_DeadSpecMode = false;
 	m_Spawning = 0;
+	if(m_Zombie == ZEATER)
+    {
+        for(int i = 0; i < 3; ++i)
+            m_aSubZomb[i] = NONE;
+    }
 }
 
 CPlayer::~CPlayer()

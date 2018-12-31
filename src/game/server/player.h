@@ -153,6 +153,8 @@ public:
 	void SetSubZomb(int i, int type){m_aSubZomb[i] = type;}
 	const char* GetZombieName(int type);
 	const char* GetZombieSkinName(int type);
+	void SetZombieWeaponType(int type){m_ZombieActiveWeaponType = type;}
+	int GetZombieWeaponType(){return m_ZombieActiveWeaponType;}
 
 private:
 	CCharacter *m_pCharacter;
@@ -169,7 +171,8 @@ private:
 
 	//Zomb2
 	int m_Zombie;
-	int m_aSubZomb[NUM_SUBTYPES];
+	int m_aSubZomb[NUM_SUBTYPES];//Zeater only
+	int m_ZombieActiveWeaponType;//Zeater only
 
 	// used for spectator mode
 	int m_SpecMode;
