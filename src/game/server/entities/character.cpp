@@ -134,7 +134,7 @@ void CCharacter::HandleNinja()
 	if(m_ActiveWeapon != WEAPON_NINJA)
 		return;
 
-	if ((Server()->Tick() - m_Ninja.m_ActivationTick) > (g_pData->m_Weapons.m_Ninja.m_Duration * Server()->TickSpeed() / 1000))
+	if ((Server()->Tick() - m_Ninja.m_ActivationTick) > (g_pData->m_Weapons.m_Ninja.m_Duration * Server()->TickSpeed() / 1000) && !m_pPlayer->GetZomb(ZINJA))
 	{
 		// time's up, return
 		m_aWeapons[WEAPON_NINJA].m_Got = false;
@@ -985,24 +985,35 @@ void CCharacter::DoZombieAim(vec2 VictimPos, int VicCID, vec2 NearZombPos, int N
 			if(!m_pPlayer->GetSubZomb(i))
 			{
 				int VictimType = GameServer()->m_apPlayers[NearZombCID]->GetZomb();
+
+                m_pPlayer->m_Score++;
+                //first set type, so that increaseHealth is working correctly
+				m_pPlayer->SetSubZomb(i, VictimType);
 				if(m_pPlayer->GetZomb(VictimType))
 					return;
 				if(VictimType == 6)
 					IncreaseHealth(100);
 				else
 					IncreaseHealth(10);
-				m_pPlayer->m_Score++;
-				m_pPlayer->SetSubZomb(i, VictimType);
+
 				GameServer()->GetPlayerChar(NearZombCID)->Die(m_pPlayer->GetCID(), WEAPON_GAME);
 
-				if(m_pPlayer->GetZomb(5))//gun
+				if(m_pPlayer->GetZomb(ZUNNER)) {//gun
 					m_ActiveWeapon = WEAPON_GUN;
-				if(m_pPlayer->GetZomb(7))//Shotgun
+					m_pPlayer->SetZombieWeaponType(ZUNNER);
+                }
+				if(m_pPlayer->GetZomb(ZOTTER)) {//Shotgun
 					m_ActiveWeapon = WEAPON_SHOTGUN;
-				if(m_pPlayer->GetZomb(8))//Grenade
+					m_pPlayer->SetZombieWeaponType(ZOTTER);
+                }
+				if(m_pPlayer->GetZomb(ZENADE)) {//Grenade
 					m_ActiveWeapon = WEAPON_GRENADE;
-				if(m_pPlayer->GetZomb(2))//Rifle
+					m_pPlayer->SetZombieWeaponType(ZENADE);
+                }
+				if(m_pPlayer->GetZomb(ZOOMER)) {//Rifle
 					m_ActiveWeapon = WEAPON_LASER;
+					m_pPlayer->SetZombieWeaponType(ZOOMER);
+                }
 				m_aWeapons[m_ActiveWeapon].m_Ammo = -1;
 				break;
 			}
@@ -1011,22 +1022,26 @@ void CCharacter::DoZombieAim(vec2 VictimPos, int VicCID, vec2 NearZombPos, int N
 
 
 	//Can do sth.
-	if(distance(m_Pos, VictimPos) <= GetTriggerDistance(m_pPlayer->GetZomb()) || (!m_pPlayer->GetZomb(4) && NearZombPos != m_Pos && distance(m_Pos, NearZombPos) <= 65.0f && GetTriggerDistance(m_pPlayer->GetZomb()) == 65.0f))//Zamer shouldnt attak other zombies
+	float triggerDist = GetTriggerDistance(m_pPlayer->GetZomb());
+	if(distance(m_Pos, VictimPos) <= triggerDist || (!m_pPlayer->GetZomb(4) && NearZombPos != m_Pos && distance(m_Pos, NearZombPos) <= 65.0f && triggerDist == 65.0f))//Zamer shouldnt attak other zombies
 	{
 		//Zinvi
-		if(m_pPlayer->GetZomb(12))
+		if(m_pPlayer->GetZomb(ZINVIS))
 			m_IsVisible = true;
 
 		//Zinja
-		if(m_pPlayer->GetZomb(10))
+		if(m_pPlayer->GetZomb(ZINJA))
 		{
-			if(m_ActiveWeapon == WEAPON_HAMMER)
+			if(m_ActiveWeapon == WEAPON_HAMMER) {
 				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_NINJA);
-			GiveNinja();
+                m_Ninja.m_CurrentMoveTime = 999;
+                GiveNinja();
+                m_pPlayer->SetZombieWeaponType(ZINJA);
+            }
 		}
 
 		//Zooker
-		if(m_pPlayer->GetZomb(3))
+		if(m_pPlayer->GetZomb(ZOOKER))
 		{
 			if(VicCID != -1 && distance(m_Pos, VictimPos) < 380.0f && GameServer()->GetPlayerChar(VicCID))//Look hooklenght in tuning.h
 			{
@@ -1048,7 +1063,7 @@ void CCharacter::DoZombieAim(vec2 VictimPos, int VicCID, vec2 NearZombPos, int N
 		}
 
 		//Zamer
-		if(m_pPlayer->GetZomb(4))
+		if(m_pPlayer->GetZomb(ZAMER))
 		{
 			m_Aim.m_Explode = true;
 			GameServer()->CreateExplosion(vec2(m_Pos.x + 5, m_Pos.y + 5), m_pPlayer->GetCID(), WEAPON_GAME, g_pData->m_Weapons.m_Grenade.m_pBase->m_Damage);
@@ -1065,9 +1080,9 @@ void CCharacter::DoZombieAim(vec2 VictimPos, int VicCID, vec2 NearZombPos, int N
 		m_Input.m_Fire = 1;
 		m_LatestPrevInput.m_Fire = 1;
 	}
-	else if(!m_pPlayer->GetZomb(8) && !m_pPlayer->GetZomb(5))
+	else if(!m_pPlayer->GetZomb(ZENADE) && !m_pPlayer->GetZomb(ZUNNER))
 	{
-		if(m_pPlayer->GetZomb(12))
+		if(m_pPlayer->GetZomb(ZINVIS))
 			m_IsVisible = false;
 		ResetAiming();
 	}
@@ -1078,7 +1093,7 @@ void CCharacter::DoZombieAim(vec2 VictimPos, int VicCID, vec2 NearZombPos, int N
 
 void CCharacter::Snap(int SnappingClient)
 {
-	if(NetworkClipped(SnappingClient) || (m_pPlayer->GetZomb(12) && !m_IsVisible && SnappingClient != m_pPlayer->GetCID()))
+	if(NetworkClipped(SnappingClient) || (m_pPlayer->GetZomb(ZINVIS) && !m_IsVisible && SnappingClient != m_pPlayer->GetCID()))
 		return;
 
 	CNetObj_Character *pCharacter = static_cast<CNetObj_Character *>(Server()->SnapNewItem(NETOBJTYPE_CHARACTER, m_pPlayer->GetCID(), sizeof(CNetObj_Character)));
@@ -1190,5 +1205,9 @@ float CCharacter::GetTriggerDistance(int Type)
 		return 500.0f;
 	else if(Type == ZOOKER)//Zooker
 		return 380.0f;
+    else if(Type == ZEATER)
+    {
+        return GetTriggerDistance(m_pPlayer->GetZombieWeaponType());
+    }
 	return 65.0f;//Rest
 }
