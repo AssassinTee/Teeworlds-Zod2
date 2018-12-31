@@ -1242,8 +1242,11 @@ void IGameController::StartWave(int Wave)
 		m_Zombie[0] = 40;
 	else
 		SetWaveAlg(Wave%3, Wave/3);*/
-    for(int i = 0; i < ZEATER-1; i++)
-        m_Zombie[i] = 2;
+    m_Zombie[ZINJA-1] = 10;
+    m_Zombie[ZASTER-1] = 1;
+    m_Zombie[ZAMER-1] = 1;
+    m_Zombie[ZUNNER-1] = 1;
+    m_Zombie[ZEATER-1] = 1;
     //m_Zombie[ZAMER-1] = 5;
 
 	//Message Shit
