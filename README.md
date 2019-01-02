@@ -14,7 +14,7 @@ The game is over, after all teamlifes are gone.
 ## Install
 * clone this repository
 
-* compile the game the same way, you [compile default Teeworlds](https://www.teeworlds.com/?page=docs&wiki=compiling_everything_linux)
+* compile the game the same way, you [compile default Teeworlds](https://www.teeworlds.com/?page=docs&wiki=compiling_everything). Remember, that this mod is written for **Teeworlds 0.7.x**. You only need the server, so use the command `<path>/bam conf=release server` for compiling
 
 * start the server with
   - Linux: `./teeworlds_srv` (It may be found under /build)
