@@ -16,7 +16,9 @@ The game is over, after all teamlifes are gone.
 
 * compile the game the same way, you [compile default Teeworlds](https://www.teeworlds.com/?page=docs&wiki=compiling_everything_linux)
 
-* start the server with `./teeworlds_srv` (It may be found under /build)
+* start the server with
+  - Linux: `./teeworlds_srv` (It may be found under /build)
+  - Windows: doubleclick `teeworlds_srv.exe`
 * you may have to call the restart command in the admin console (of teeworlds)
 * Have Fun!
 
