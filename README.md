@@ -12,11 +12,11 @@ If you die, the **team** loses one if its lifes.
 The game is over, after all teamlifes are gone.
 
 ## Install
-* Clone this repository
+* clone this repository
 
-* compile the game the same way, you [compile default Teeworlds](https://www.teeworlds.com/?page=docs&wiki=compiling_everything_linux).
+* compile the game the same way, you [compile default Teeworlds](https://www.teeworlds.com/?page=docs&wiki=compiling_everything_linux)
 
-* start the server with ./teeworlds_srv. (It may be found under /build)
+* start the server with `./teeworlds_srv` (It may be found under /build)
 * you may have to call the restart command in the admin console (of teeworlds)
 * Have Fun!
 
