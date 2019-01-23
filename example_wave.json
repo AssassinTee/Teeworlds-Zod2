@@ -1,0 +1,121 @@
+{
+  "Version": "1.0.0",
+  "Waves": {
+    "1": {
+      "Zaby": 10
+    },
+    "2": {
+      "Zaby": 10,
+      "Zooker": 2
+    },
+    "3": {
+      "Zaby": 20,
+      "Zooker": 2,
+      "Zamer": 5
+    },
+    "4": {
+      "Zaby": 10,
+      "Zooker": 2,
+      "Zamer": 10,
+      "Zunner": 5
+    },
+    "5": {
+      "Zaster": 2,
+      "Zaby": 10,
+      "Zooker": 2,
+      "Zamer": 10,
+      "Zunner": 10
+    },
+    "6": {
+      "Zaster": 2,
+      "Zaby": 10,
+      "Zooker": 2,
+      "Zamer": 10,
+      "Zunner": 10,
+      "Zotter": 10
+    },
+    "7": {
+      "Zaster": 2,
+      "Zaby": 10,
+      "Zooker": 2,
+      "Zamer": 10,
+      "Zunner": 10,
+      "Zotter": 10,
+      "Zenade": 10
+    },
+    "8": {
+      "Zaster": 2,
+      "Zaby": 10,
+      "Zooker": 2,
+      "Zamer": 10,
+      "Zunner": 10,
+      "Zotter": 10,
+      "Zenade": 10,
+      "Flombie": 10
+    },
+    "9": {
+      "Zaster": 2,
+      "Zaby": 10,
+      "Zooker": 2,
+      "Zamer": 10,
+      "Zunner": 10,
+      "Zotter": 10,
+      "Zenade": 10,
+      "Flombie": 10,
+      "Zinja": 10
+    },
+    "10": {
+            "Zaster": 2,
+      "Zaby": 10,
+      "Zooker": 2,
+      "Zamer": 10,
+      "Zunner": 10,
+      "Zotter": 10,
+      "Zenade": 10,
+      "Flombie": 10,
+      "Zinja": 10,
+      "Zele": 10
+    },
+    "11": {
+      "Zaster": 2,
+      "Zaby": 10,
+      "Zooker": 2,
+      "Zamer": 10,
+      "Zunner": 10,
+      "Zotter": 10,
+      "Zenade": 10,
+      "Flombie": 10,
+      "Zinja": 10,
+      "Zele": 10,
+      "Zinvis": 10
+    },
+    "12": {
+      "Zaster": 2,
+      "Zaby": 10,
+      "Zooker": 2,
+      "Zamer": 10,
+      "Zunner": 10,
+      "Zotter": 10,
+      "Zenade": 10,
+      "Flombie": 10,
+      "Zinja": 10,
+      "Zele": 10,
+      "Zinvis": 10,
+      "Zoomer": 10
+    },
+    "13": {
+      "Zaster": 2,
+      "Zaby": 10,
+      "Zooker": 2,
+      "Zamer": 10,
+      "Zunner": 10,
+      "Zotter": 10,
+      "Zenade": 10,
+      "Flombie": 10,
+      "Zinja": 10,
+      "Zele": 10,
+      "Zinvis": 10,
+      "Zeater": 10
+    }
+  }
+}
