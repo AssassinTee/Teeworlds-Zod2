@@ -52,6 +52,7 @@ IGameController::IGameController(CGameContext *pGameServer)
 	m_aNumSpawnPoints[2] = 0;
 
 	m_Wave = 0;
+	m_CWave.ReadFile(g_Config.m_SvWaveFile);
 	mem_zero(m_Zombie, sizeof(m_Zombie));
 }
 
@@ -1242,11 +1243,17 @@ void IGameController::StartWave(int Wave)
 		m_Zombie[0] = 40;
 	else
 		SetWaveAlg(Wave%3, Wave/3);*/
+    std::vector<int> zomb_nums = m_CWave.GetZombNum(Wave);
+    for(int i = 0; i < (int)(sizeof(m_Zombie)/sizeof(m_Zombie[0])); i++)
+    {
+        m_Zombie[i] = zomb_nums[i];
+    }
+    /*
     m_Zombie[ZINJA-1] = 10;
     m_Zombie[ZASTER-1] = 1;
     m_Zombie[ZAMER-1] = 1;
     m_Zombie[ZUNNER-1] = 1;
-    m_Zombie[ZEATER-1] = 1;
+    m_Zombie[ZEATER-1] = 1;*/
     //m_Zombie[ZAMER-1] = 5;
 
 	//Message Shit

@@ -6,6 +6,7 @@
 #include <base/vmath.h>
 
 #include <generated/protocol.h>
+#include "wave.h"
 
 /*
 	Class: Game Controller
@@ -91,6 +92,9 @@ class IGameController
 
 	// team
 	int ClampTeam(int Team) const;
+
+	//Zomb2
+	CWave m_CWave;
 
 protected:
 	CGameContext *GameServer() const { return m_pGameServer; }
