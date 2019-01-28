@@ -9,6 +9,7 @@
 #include "gamecontext.h"
 #include "gamecontroller.h"
 #include "player.h"
+#include "top5/topfivejson.h"
 
 
 IGameController::IGameController(CGameContext *pGameServer)
@@ -52,6 +53,7 @@ IGameController::IGameController(CGameContext *pGameServer)
 	m_aNumSpawnPoints[2] = 0;
 
 	m_Wave = 0;
+	m_pTopFive = new CTopFiveJson(g_Config.m_SvLives, g_Config.m_SvMap);
 	m_CWave.ReadFile(g_Config.m_SvWaveFile);
 	mem_zero(m_Zombie, sizeof(m_Zombie));
 }
@@ -632,12 +634,17 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 			break;
 	case IGS_END_MATCH:
 		// only possible when game is running or over
-		if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_END_MATCH || m_GameState == IGS_END_ROUND || m_GameState == IGS_GAME_PAUSED)
+		if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_END_MATCH || m_GameState == IGS_END_ROUND || m_GameState == IGS_GAME_PAUSED || m_GameState == IGS_NEXT_WAVE)
 		{
 			m_GameState = GameState;
 			m_GameStateTimer = Timer*Server()->TickSpeed();
 			m_SuddenDeath = 0;
 			GameServer()->m_World.m_Paused = true;
+			for(size_t i = 0; i < sizeof(m_Zombie)/sizeof(m_Zombie[0]); ++i)
+			{
+                m_Zombie[i] = 0;
+			}
+			SaveTopFive();
 		}
 	case IGS_NEXT_WAVE:
         if(m_GameState == IGS_GAME_RUNNING)
@@ -669,7 +676,7 @@ void IGameController::StartMatch()
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
     for(int i = 4; i < MAX_CLIENTS; i++)//bugfix
-        GameServer()->OnZombieKill(i);
+        GameServer()->OnZombieKill(i, -1);
     m_aTeamscore[TEAM_RED] = g_Config.m_SvLives;
     m_Wave=1;
     StartWave(m_Wave);
@@ -1309,7 +1316,7 @@ bool IGameController::EndWave()
 	}
 	if(k != -1) {
         for(int i = 4; i < 64; i++)
-            GameServer()->OnZombieKill(i);
+            GameServer()->OnZombieKill(i, -1);
         //HandleTop();
         m_Wave = 0;
         return true;
@@ -1438,4 +1445,18 @@ int IGameController::GetZombieReihenfolge(int wavedrittel)//Was heißt Riehenfol
 		return 1;
 	else//shouldnt be needed
 		return 0;
+}
+
+void IGameController::SaveTopFive()
+{
+    m_pTopFive->SetWave(m_Wave);
+    for(int i = 0; i < 4; ++i)
+    {
+        if(Server()->ClientIngame(i))
+        {
+            m_pTopFive->SetPlayerName(i, std::string(Server()->ClientName(i)));
+        }
+    }
+    m_pTopFive->SaveGameEntry();
+    m_pTopFive->Reset(g_Config.m_SvLives, g_Config.m_SvMap);
 }

@@ -7,6 +7,7 @@
 
 #include <generated/protocol.h>
 #include "wave.h"
+#include "top5/topfivebase.h"
 
 /*
 	Class: Game Controller
@@ -95,6 +96,9 @@ class IGameController
 
 	//Zomb2
 	CWave m_CWave;
+	ITopFive* m_pTopFive;
+
+	void SaveTopFive();
 
 protected:
 	CGameContext *GameServer() const { return m_pGameServer; }
@@ -242,6 +246,8 @@ public:
     void DescreaseZombLeft() {m_ZombLeft--;}
     void SetTeamscore(int team, int score){m_aTeamscore[team] = score;}
     int GetTeamscore(int team) {return m_aTeamscore[team];}
+
+    ITopFive* GetTopFive() {return m_pTopFive;}
 };
 
 #endif

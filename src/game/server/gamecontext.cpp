@@ -21,6 +21,8 @@
 #include "gamecontext.h"
 #include "player.h"
 
+#include <sstream>
+
 enum
 {
 	RESET,
@@ -206,15 +208,31 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 
 	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, aBufMode, aBuf);
 
+    if(Mode == CHAT_ALL && (pText[0] == '!' || pText[0] == '/'))
+    {
+        std::vector<std::string> commands = {"cmdlist", "info", "help", "top5"};
+        for(auto it = commands.begin(); it != commands.end(); ++it)
+        {
+            if(!str_comp(pText, ("!"+(*it)).c_str()) || !str_comp(pText, ("/"+(*it)).c_str()))
+            {
+                //Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ChatterClientID);
+                SendCommand(ChatterClientID, *it);
+                return;
+            }
+        }
+    }
 
-	CNetMsg_Sv_Chat Msg;
+    CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = Mode;
 	Msg.m_ClientID = ChatterClientID;
 	Msg.m_pMessage = pText;
 	Msg.m_TargetID = -1;
 
-	if(Mode == CHAT_ALL)
+
+	if(Mode == CHAT_ALL) {
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+
+    }
 	else if(Mode == CHAT_TEAM)
 	{
 		// pack one for the recording only
@@ -236,6 +254,79 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ChatterClientID);
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
 	}
+}
+
+void CGameContext::SendCommand(int CatterClientID, std::string command)
+{
+
+	std::vector<std::string> messageList;
+    if(command == "cmdlist")
+    {
+        messageList.push_back("###Command-list###");
+        messageList.push_back("'!cmdlist'- show commands");
+        messageList.push_back("'!help' - show help");
+        messageList.push_back("'!top5' - show Top5 of current map with current lifes");
+        messageList.push_back("'!info' - show mod information");
+    }
+    else if(command == "help")
+    {
+        messageList.push_back("###Help###");
+        messageList.push_back("Kill as many Zombies as possible!");
+        messageList.push_back("Be carefull, Zombies are very strong.");
+        messageList.push_back("Lifes are shared between Humans, so survival is very important.");
+    }
+    else if(command == "info")
+    {
+        messageList.push_back("###Info###");
+        messageList.push_back("Zod (Zombie-Mod) by /\\ssa (AssassinTee)");
+        messageList.push_back("You like it? Give me a Star on GitHub!");
+        messageList.push_back("https://github.com/AssassinTee/Teeworlds-Zod2");
+    }
+    else if(command == "top5")
+    {
+        //m_pController->GetTopFive()->
+        //Msg.m_pMessage = "###Top5###";
+        //Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+        char aBuf[128];
+        str_format(aBuf, sizeof(aBuf), "Test1");
+        Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
+        messageList.push_back("###Top5###");
+        std::vector<STopFiveGameEntry> entries = m_pController->GetTopFive()->GetTopFive();
+        str_format(aBuf, sizeof(aBuf), "Test2");
+        Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
+        if(!entries.size())
+        {
+            messageList.push_back("# No Results, feel free to add a highscore! #");
+            messageList.push_back("##########");
+        }
+        for(size_t i = 0; i < entries.size(); ++i)
+        {
+            std::stringstream ss;
+            ss << "#" << (i+1) << ": ";
+            for(size_t j = 0; j < 4; ++j)
+            {
+                //str_format(aBuf, sizeof(aBuf), "#%d: %s;", i+1, entries[i].player_entry[0].name.c_str());
+                if(entries[i].player_entry[j].kills > 0)
+                    ss << entries[i].player_entry[j].name << "(" << entries[i].player_entry[j].kills << "),";
+
+            }
+            messageList.push_back(ss.str());
+            char aBuf[128];
+            str_format(aBuf, sizeof(aBuf), "\t wave: %d kills: %d", entries[i].wave, entries[i].kills);
+            messageList.push_back(std::string(aBuf));
+        }
+    }
+
+    CNetMsg_Sv_Chat Msg;
+	Msg.m_Mode = CHAT_ALL;
+	Msg.m_ClientID = -1;
+
+	Msg.m_TargetID = -1;
+    for(auto it = messageList.begin(); it != messageList.end(); ++it)
+    {
+        Msg.m_pMessage = it->c_str();
+        Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+    }
 }
 
 void CGameContext::SendBroadcast(const char* pText, int ClientID)
@@ -711,30 +802,39 @@ void CGameContext::OnZombie(int ClientID, int Zomb)
 	}
 }
 
-void CGameContext::OnZombieKill(int ClientID)
+void CGameContext::OnZombieKill(int VictimID, int KillerID)
 {
-    if(ClientID >= 4) {
+    if(VictimID >= 4) {
 
         //Send fucking netmessage
         CNetMsg_Sv_ClientDrop Msg;
-        Msg.m_ClientID = ClientID;
+        Msg.m_ClientID = VictimID;
         Msg.m_pReason = "";
         Msg.m_Silent = true;
 
         Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
-        if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetCharacter())
-            m_apPlayers[ClientID]->DeleteCharacter();
+        if(m_apPlayers[VictimID] && m_apPlayers[VictimID]->GetCharacter())
+            m_apPlayers[VictimID]->DeleteCharacter();
 
-        if(m_apPlayers[ClientID])
-            delete m_apPlayers[ClientID];
+        if(m_apPlayers[VictimID])
+            delete m_apPlayers[VictimID];
 
-        m_apPlayers[ClientID] = 0;
+        m_apPlayers[VictimID] = 0;
         m_pController->DescreaseZombLeft();
+
+        //Stats
+        m_pController->GetTopFive()->IncreaseKills();
     }
     else
     {
         m_pController->SetTeamscore(TEAM_RED, m_pController->GetTeamscore(TEAM_RED)-1);
         m_pController->DoLifeMessage(m_pController->GetTeamscore(TEAM_RED));
+    }
+    //Stats
+    if(KillerID >= 0 && KillerID < 4)
+    {
+
+        m_pController->GetTopFive()->IncreasePlayerKill(KillerID);
     }
 	// update spectator modes
 	/*for(int i = 0; i < 4; ++i)

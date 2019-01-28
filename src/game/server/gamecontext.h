@@ -11,6 +11,7 @@
 
 #include "eventhandler.h"
 #include "gameworld.h"
+#include "top5/topfivebase.h"
 
 /*
 	Tick
@@ -86,7 +87,7 @@ public:
 	CGameWorld m_World;
 
 	// helper functions
-	class CCharacter *GetPlayerChar(int ClientID);
+	class CCharacter *GetPlayerChar(int VictimID);
 
 	int m_LockTeams;
 
@@ -133,6 +134,8 @@ public:
 
 	// network
 	void SendChat(int ChatterClientID, int Mode, int To, const char *pText);
+    //Zomb
+	void SendCommand(int ChatterClientID, std::string command);
 	void SendBroadcast(const char *pText, int ClientID);
 	void SendEmoticon(int ClientID, int Emoticon);
 	void SendWeaponPickup(int ClientID, int Weapon);
@@ -179,7 +182,7 @@ public:
 
 		//Zomb2
 	void OnZombie(int ClientID, int Zomb);
-    void OnZombieKill(int ClientID);
+    void OnZombieKill(int ClientID, int KillerID);
 };
 
 inline int64 CmaskAll() { return -1; }
