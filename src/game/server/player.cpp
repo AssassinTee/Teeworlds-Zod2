@@ -6,6 +6,7 @@
 #include "gamecontext.h"
 #include "gamecontroller.h"
 #include "player.h"
+#include "tools/skinreader.h"
 
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS)
@@ -201,13 +202,6 @@ void CPlayer::Snap(int SnappingClient)
             StrToInts(pClientInfo->m_aName, 4, GetZombieName(m_Zombie));
             StrToInts(pClientInfo->m_aClan, 3, "Zombie");
             pClientInfo->m_Country = 0;
-
-            for(int p = 0; p < 6; p++)
-            {
-                StrToInts(pClientInfo->m_aaSkinPartNames[p], 6, GetZombieSkinName(m_Zombie));
-                pClientInfo->m_aUseCustomColors[p] = 0;
-                pClientInfo->m_aSkinPartColors[p] = 16776960;
-            }
         }
         else {
             pClientInfo->m_Local = 0;
@@ -215,13 +209,13 @@ void CPlayer::Snap(int SnappingClient)
             StrToInts(pClientInfo->m_aName, 4, Server()->ClientName(m_ClientID));
             StrToInts(pClientInfo->m_aClan, 3, Server()->ClientClan(m_ClientID));
             pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
+        }
 
-            for(int p = 0; p < 6; p++)
-            {
-                StrToInts(pClientInfo->m_aaSkinPartNames[p], 6, m_TeeInfos.m_aaSkinPartNames[p]);
-                pClientInfo->m_aUseCustomColors[p] = m_TeeInfos.m_aUseCustomColors[p];
-                pClientInfo->m_aSkinPartColors[p] = m_TeeInfos.m_aSkinPartColors[p];
-            }
+        for(int p = 0; p < 6; p++)
+        {
+            StrToInts(pClientInfo->m_aaSkinPartNames[p], 6, m_TeeInfos.m_aaSkinPartNames[p]);
+            pClientInfo->m_aUseCustomColors[p] = m_TeeInfos.m_aUseCustomColors[p];
+            pClientInfo->m_aSkinPartColors[p] = m_TeeInfos.m_aSkinPartColors[p];
         }
 	}
 }
@@ -549,24 +543,25 @@ const char* CPlayer::GetZombieName(int type)
     }
 }
 
-const char* CPlayer::GetZombieSkinName(int type)
+const char* CPlayer::GetZombieSkinName(int type, int what, bool& custom_colors, int& hue, int& sat, int& lgt, int& alp)
 {
+    static CSkinReader reader(GameServer()->Console());
     switch(type)
     {
-        case ZABY: return "zaby";
-        case ZOOMER: return "redstripe";
-        case ZOOKER: return "bluekitty";
-        case ZAMER: return "twinbop";
-        case ZUNNER: return "cammostripes";
-        case ZASTER: return "coala";
-        case ZOTTER: return "cammo";
-        case ZENADE: return "twintri";
-        case FLOMBIE: return "toptri";
-        case ZINJA: return "default";
-        case ZELE: return "redbopp";
-        case ZINVIS: return "zaby";
-        case ZEATER: return "warpaint";
+        case ZABY: return reader.GetSkinName(std::string("zaby"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZOOMER: return reader.GetSkinName(std::string("redstripe"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZOOKER: return reader.GetSkinName(std::string("bluekitty"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZAMER: return reader.GetSkinName(std::string("twinbop"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZUNNER: return reader.GetSkinName(std::string("cammostripes"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZASTER: return reader.GetSkinName(std::string("coala"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZOTTER: return reader.GetSkinName(std::string("cammo"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZENADE: return reader.GetSkinName(std::string("twintri"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case FLOMBIE: return reader.GetSkinName(std::string("toptri"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZINJA: return reader.GetSkinName(std::string("default"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZELE: return reader.GetSkinName(std::string("redbopp"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZINVIS: return reader.GetSkinName(std::string("zaby"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZEATER: return reader.GetSkinName(std::string("warpaint"), what, custom_colors, hue, sat, lgt, alp).c_str();
         default:
-            return "default";
+            return "standard";
     }
 }
