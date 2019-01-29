@@ -210,7 +210,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 
     if(Mode == CHAT_ALL && (pText[0] == '!' || pText[0] == '/'))
     {
-        std::vector<std::string> commands = {"cmdlist", "info", "help", "top5"};
+        std::vector<std::string> commands = {"cmdlist", "info", "help", "top5", "rank"};
         for(auto it = commands.begin(); it != commands.end(); ++it)
         {
             if(!str_comp(pText, ("!"+(*it)).c_str()) || !str_comp(pText, ("/"+(*it)).c_str()))
@@ -256,7 +256,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	}
 }
 
-void CGameContext::SendCommand(int CatterClientID, std::string command)
+void CGameContext::SendCommand(int ChatterClientID, std::string command)
 {
 
 	std::vector<std::string> messageList;
@@ -306,13 +306,38 @@ void CGameContext::SendCommand(int CatterClientID, std::string command)
             for(size_t j = 0; j < 4; ++j)
             {
                 //str_format(aBuf, sizeof(aBuf), "#%d: %s;", i+1, entries[i].player_entry[0].name.c_str());
-                if(entries[i].player_entry[j].kills > 0)
+                if(entries[i].player_entry[j].kills > 0 && entries[i].player_entry[j].name != "")
                     ss << entries[i].player_entry[j].name << "(" << entries[i].player_entry[j].kills << "),";
 
             }
             messageList.push_back(ss.str());
             char aBuf[128];
             str_format(aBuf, sizeof(aBuf), "\t wave: %d kills: %d", entries[i].wave, entries[i].kills);
+            messageList.push_back(std::string(aBuf));
+        }
+    }
+    else if(command == "rank")
+    {
+        std::stringstream ss;
+        int rank;
+        STopFiveGameEntry game = m_pController->GetTopFive()->GetRank(std::string(Server()->ClientName(ChatterClientID)), rank);
+        if(rank == -1)
+        {
+            messageList.push_back("You aren't ranked yet");
+        }
+        else
+        {
+            ss << "#" << (rank+1) << ": ";
+            for(size_t j = 0; j < 4; ++j)
+            {
+                //str_format(aBuf, sizeof(aBuf), "#%d: %s;", i+1, entries[i].player_entry[0].name.c_str());
+                if(game.player_entry[j].kills > 0 && game.player_entry[j].name != "")
+                    ss << game.player_entry[j].name << "(" << game.player_entry[j].kills << "),";
+
+            }
+            messageList.push_back(ss.str());
+            char aBuf[128];
+            str_format(aBuf, sizeof(aBuf), "\t wave: %d kills: %d", game.wave, game.kills);
             messageList.push_back(std::string(aBuf));
         }
     }
@@ -716,9 +741,9 @@ void CGameContext::OnClientEnter(int ClientID)
 	}
 
 
-	for(int i = 0; i < 4; ++i)
+	for(int i = 0; i < 64; ++i)
 	{
-		if(i == ClientID || !m_apPlayers[i] || (!Server()->ClientIngame(i) && !m_apPlayers[i]->IsDummy()))
+		if(i == ClientID || !m_apPlayers[i] || (!Server()->ClientIngame(i) && !m_apPlayers[i]->IsDummy() && !m_apPlayers[i]->GetZomb()))
 			continue;
 
 		// new info for others
@@ -779,8 +804,22 @@ void CGameContext::OnZombie(int ClientID, int Zomb)
 	NewClientInfoMsg.m_Country = 0;
 	NewClientInfoMsg.m_Silent = true;
 
-	if(g_Config.m_SvSilentSpectatorMode && m_apPlayers[ClientID]->GetTeam() == TEAM_SPECTATORS)
-		NewClientInfoMsg.m_Silent = true;
+    for(int p = 0; p < 6; p++)
+	{
+        bool custom_colors;
+        int hue, sat, lgt, alp, color;
+
+        const char* filename = m_apPlayers[ClientID]->GetZombieSkinName(Zomb, p, custom_colors, hue, sat, lgt, alp);
+		color = (((alp << 24)&(0xFF000000)) + ((hue << 16)&(0x00FF0000)) + ((sat << 8)&(0x0000FF00)) + lgt);
+
+		str_copy(m_apPlayers[ClientID]->m_TeeInfos.m_aaSkinPartNames[p], filename, 24);
+		m_apPlayers[ClientID]->m_TeeInfos.m_aUseCustomColors[p] = custom_colors;
+        m_apPlayers[ClientID]->m_TeeInfos.m_aSkinPartColors[p] = color;
+
+        char aBuf[128];
+        str_format(aBuf, sizeof(aBuf), "Zombieskinname '%d': %s %d %d %d %d %d", p, filename, custom_colors, hue, sat, lgt, alp);
+        Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", aBuf);
+	}
 
     for(int p = 0; p < 6; p++)
 	{
@@ -793,9 +832,9 @@ void CGameContext::OnZombie(int ClientID, int Zomb)
 	{
 		if(i == ClientID || !m_apPlayers[i] || (!Server()->ClientIngame(i) && !m_apPlayers[i]->IsDummy()))
 			continue;
-        char aBuf[128];
-        str_format(aBuf, sizeof(aBuf), "Send zombie info on '%d'", i);
-        Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", aBuf);
+        //char aBuf[128];
+        //str_format(aBuf, sizeof(aBuf), "Send zombie info on '%d'", i);
+        //Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", aBuf);
 		// new info for others
 		if(Server()->ClientIngame(i))
 			Server()->SendPackMsg(&NewClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
