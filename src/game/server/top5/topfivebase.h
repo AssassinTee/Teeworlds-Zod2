@@ -70,6 +70,7 @@ public:
 
     virtual void SaveGameEntry() = 0;
     virtual std::vector<STopFiveGameEntry> GetTopFive() = 0;
+    virtual STopFiveGameEntry& GetRank(std::string name, int& rank) = 0;
 
     STopFiveGameEntry& GetGameEntry() {return m_GameEntry;}
 

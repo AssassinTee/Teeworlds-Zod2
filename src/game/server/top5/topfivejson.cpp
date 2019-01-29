@@ -23,11 +23,37 @@ void CTopFiveJson::SaveGameEntry()
 
 std::vector<STopFiveGameEntry> CTopFiveJson::GetTopFive()
 {
-    std::vector<STopFiveGameEntry>::const_iterator first = m_Entries.begin();
-    size_t len = std::min(m_Entries.size(),(size_t)5);
-    std::vector<STopFiveGameEntry>::const_iterator last = m_Entries.begin()+len;
-    return std::vector<STopFiveGameEntry>(first, last);
+    std::vector<STopFiveGameEntry> res;
+    for(auto it = m_Entries.begin(); it != m_Entries.end(); ++it)
+    {
+        if(it->lifes == m_GameEntry.lifes)
+        {
+            res.push_back(*it);
+        }
+        if(res.size() == 5)
+            break;
+    }
+    return res;
     //return m_Entries;
+}
+
+STopFiveGameEntry& CTopFiveJson::GetRank(std::string name, int& rank)
+{
+    for(size_t j = 0; j < m_Entries.size(); ++j)
+    {
+        if(m_Entries[j].lifes == m_GameEntry.lifes) {
+            for(int i = 0; i < TOP_FIVE_PLAYER_NUM_ENTRY; ++i)
+            {
+                if(m_Entries[j].player_entry[i].name == name)
+                {
+                    rank = j;
+                    return m_Entries[j];
+                }
+            }
+        }
+    }
+    rank = -1;
+    return m_GameEntry;
 }
 
 void CTopFiveJson::ReadJsonFile()

@@ -13,6 +13,7 @@ public:
 
     void SaveGameEntry() override;
     std::vector<STopFiveGameEntry> GetTopFive() override;
+    STopFiveGameEntry& GetRank(std::string name, int& rank) override;
 private:
     void ReadJsonFile();
     void SaveJsonFile();
