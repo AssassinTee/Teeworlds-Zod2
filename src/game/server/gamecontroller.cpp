@@ -662,6 +662,7 @@ void IGameController::StartMatch()
 	m_RoundCount = 0;
 	m_aTeamscore[TEAM_RED] = g_Config.m_SvLives;
 	m_aTeamscore[TEAM_BLUE] = 0;
+	m_pTopFive->GetGameEntry().lifes = g_Config.m_SvLives;
 
 	// start countdown if there're enough players, otherwise do warmup till there're
 	//if(HasEnoughPlayers())
