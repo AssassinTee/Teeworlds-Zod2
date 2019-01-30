@@ -30,19 +30,24 @@ std::vector<int> CWave::GetZombNum(int wave)
     std::string wave_str= std::to_string(wave);
     json waves = m_Json.at("Waves");
     //GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "debug", aBuf);
-    json curwave = waves.at(wave_str);
-    if(true)
+
+    json j = waves[wave_str];
+    if(!j.is_object())
     {
-        json j = curwave;//*it;
-        std::vector<int> result;
-        for(int i = 0; i < 13; ++i)
-        {
-            result.push_back(j.value(m_JsonZombieNames[i], 0));
-        }
-        return result;
-    }
-    else
         return GetEndlessWave();
+    }
+    //if(j.is_object()){
+    std::vector<int> result;
+    for(int i = 0; i < 13; ++i)
+    {
+        result.push_back(j.value(m_JsonZombieNames[i], 0));
+    }
+    return result;
+    /*}
+    else
+    {
+        return GetEndlessWave();
+    }*/
 }
 
 std::vector<int> CWave::GetEndlessWave()
