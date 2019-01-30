@@ -287,33 +287,33 @@ void CGameContext::SendCommand(int ChatterClientID, std::string command)
         //m_pController->GetTopFive()->
         //Msg.m_pMessage = "###Top5###";
         //Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
-        char aBuf[128];
-        str_format(aBuf, sizeof(aBuf), "Test1");
-        Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
-        messageList.push_back("###Top5###");
+
+        std::stringstream ss;
+        ss << "###Top5### requested by '" << Server()->ClientName(ChatterClientID) << "'";
+        messageList.push_back(ss.str());
+        ss.str(std::string());
+
         std::vector<STopFiveGameEntry> entries = m_pController->GetTopFive()->GetTopFive();
-        str_format(aBuf, sizeof(aBuf), "Test2");
-        Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
+
         if(!entries.size())
         {
-            messageList.push_back("# No Results, feel free to add a highscore! #");
+            messageList.push_back("# No results, feel free to add a highscore! #");
             messageList.push_back("##########");
         }
         for(size_t i = 0; i < entries.size(); ++i)
         {
-            std::stringstream ss;
             ss << "#" << (i+1) << ": ";
             for(size_t j = 0; j < 4; ++j)
             {
-                //str_format(aBuf, sizeof(aBuf), "#%d: %s;", i+1, entries[i].player_entry[0].name.c_str());
                 if(entries[i].player_entry[j].kills > 0 && entries[i].player_entry[j].name != "")
                     ss << entries[i].player_entry[j].name << "(" << entries[i].player_entry[j].kills << "),";
 
             }
             messageList.push_back(ss.str());
-            char aBuf[128];
-            str_format(aBuf, sizeof(aBuf), "\t wave: %d kills: %d", entries[i].wave, entries[i].kills);
-            messageList.push_back(std::string(aBuf));
+            ss.str(std::string());
+            ss << "\t wave: " << entries[i].wave << " kills: " << entries[i].kills;
+            messageList.push_back(ss.str());
+            ss.str(std::string());
         }
     }
     else if(command == "rank")
@@ -323,10 +323,15 @@ void CGameContext::SendCommand(int ChatterClientID, std::string command)
         STopFiveGameEntry game = m_pController->GetTopFive()->GetRank(std::string(Server()->ClientName(ChatterClientID)), rank);
         if(rank == -1)
         {
-            messageList.push_back("You aren't ranked yet");
+            ss << "Player '" << Server()->ClientName(ChatterClientID) << "' is not ranked yet";
+            messageList.push_back(ss.str());
         }
         else
         {
+            ss << "###Rank### requested by '" << Server()->ClientName(ChatterClientID) << "'";
+            messageList.push_back(ss.str());
+            ss.str(std::string());
+
             ss << "#" << (rank+1) << ": ";
             for(size_t j = 0; j < 4; ++j)
             {
@@ -336,9 +341,9 @@ void CGameContext::SendCommand(int ChatterClientID, std::string command)
 
             }
             messageList.push_back(ss.str());
-            char aBuf[128];
-            str_format(aBuf, sizeof(aBuf), "\t wave: %d kills: %d", game.wave, game.kills);
-            messageList.push_back(std::string(aBuf));
+            ss.str(std::string());
+            ss << "\t wave: " << game.wave << " kills: " << game.kills;
+            messageList.push_back(ss.str());
         }
     }
 
@@ -807,18 +812,15 @@ void CGameContext::OnZombie(int ClientID, int Zomb)
     for(int p = 0; p < 6; p++)
 	{
         bool custom_colors;
-        int hue, sat, lgt, alp, color;
+        int color;
 
-        const char* filename = m_apPlayers[ClientID]->GetZombieSkinName(Zomb, p, custom_colors, hue, sat, lgt, alp);
-		color = (((alp << 24)&(0xFF000000)) + ((hue << 16)&(0x00FF0000)) + ((sat << 8)&(0x0000FF00)) + lgt);
-
-		str_copy(m_apPlayers[ClientID]->m_TeeInfos.m_aaSkinPartNames[p], filename, 24);
+        m_apPlayers[ClientID]->GetZombieSkinName(m_apPlayers[ClientID]->m_TeeInfos.m_aaSkinPartNames[p], Zomb, p, custom_colors, color);
 		m_apPlayers[ClientID]->m_TeeInfos.m_aUseCustomColors[p] = custom_colors;
         m_apPlayers[ClientID]->m_TeeInfos.m_aSkinPartColors[p] = color;
 
-        char aBuf[128];
-        str_format(aBuf, sizeof(aBuf), "Zombieskinname '%d': %s %d %d %d %d %d", p, filename, custom_colors, hue, sat, lgt, alp);
-        Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", aBuf);
+        //char aBuf[128];
+        //str_format(aBuf, sizeof(aBuf), "Zombieskinname '%d': %s %d %d", p, filename, custom_colors, color);
+        //Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", aBuf);
 	}
 
     for(int p = 0; p < 6; p++)
