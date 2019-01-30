@@ -543,25 +543,30 @@ const char* CPlayer::GetZombieName(int type)
     }
 }
 
-const char* CPlayer::GetZombieSkinName(int type, int what, bool& custom_colors, int& hue, int& sat, int& lgt, int& alp)
+void CPlayer::GetZombieSkinName(char* filename, int type, int what, bool& custom_colors, int& color)
 {
     static CSkinReader reader(GameServer()->Console());
+    reader.GetSkinName(filename, std::string(GetZombieSkinName(type)), what, custom_colors, color);
+}
+
+const char* CPlayer::GetZombieSkinName(int type)
+{
     switch(type)
     {
-        case ZABY: return reader.GetSkinName(std::string("zaby"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case ZOOMER: return reader.GetSkinName(std::string("redstripe"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case ZOOKER: return reader.GetSkinName(std::string("bluekitty"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case ZAMER: return reader.GetSkinName(std::string("twinbop"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case ZUNNER: return reader.GetSkinName(std::string("cammostripes"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case ZASTER: return reader.GetSkinName(std::string("coala"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case ZOTTER: return reader.GetSkinName(std::string("cammo"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case ZENADE: return reader.GetSkinName(std::string("twintri"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case FLOMBIE: return reader.GetSkinName(std::string("toptri"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case ZINJA: return reader.GetSkinName(std::string("default"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case ZELE: return reader.GetSkinName(std::string("redbopp"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case ZINVIS: return reader.GetSkinName(std::string("zaby"), what, custom_colors, hue, sat, lgt, alp).c_str();
-        case ZEATER: return reader.GetSkinName(std::string("warpaint"), what, custom_colors, hue, sat, lgt, alp).c_str();
+        case ZABY: return "saddo";
+        case ZOOMER: return "redstripe";
+        case ZOOKER: return "bluekitty";
+        case ZAMER: return "twinbop";
+        case ZUNNER: return "cammostripes";
+        case ZASTER: return "coala";
+        case ZOTTER: return "cammo";
+        case ZENADE: return "twintri";
+        case FLOMBIE: return "toptri";
+        case ZINJA: return "default";
+        case ZELE: return "redbopp";
+        case ZINVIS: return "pinky";
+        case ZEATER: return "warpaint";
         default:
-            return "standard";
+            return "default";
     }
 }

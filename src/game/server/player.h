@@ -152,7 +152,8 @@ public:
 	int GetSubZomb(int i){return m_aSubZomb[i];}
 	void SetSubZomb(int i, int type){m_aSubZomb[i] = type;}
 	const char* GetZombieName(int type);
-	const char* GetZombieSkinName(int type, int what, bool& custom_colors, int& hue, int& sat, int& lgt, int& alp);
+	void GetZombieSkinName(char* filename, int type, int what, bool& custom_colors, int& color);
+    const char* GetZombieSkinName(int type);
 	void SetZombieWeaponType(int type){m_ZombieActiveWeaponType = type;}
 	int GetZombieWeaponType(){return m_ZombieActiveWeaponType;}
 

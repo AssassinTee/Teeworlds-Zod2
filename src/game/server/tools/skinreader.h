@@ -28,40 +28,44 @@ public:
 
     };
     ~CSkinReader(){};
-    std::string GetSkinName(std::string skinname, int part, bool& custom_colors, int& hue, int& sat, int& lgt, int& alp)
+    void GetSkinName(char* filename, std::string skinname, int part, bool& custom_colors, int& color)
     {
-        switch(part)
-        {
-            case 0: return GetInfo(skinname, std::string("body"), custom_colors, hue, sat, lgt, alp);
-            case 1: return GetInfo(skinname, std::string("marking"), custom_colors, hue, sat, lgt, alp);
-            //case 2: return GetInfo(skinname, std::string("decoration"), custom_colors, hue, sat, lgt, alp);
-            case 3: return GetInfo(skinname, std::string("hands"), custom_colors, hue, sat, lgt, alp);
-            case 4: return GetInfo(skinname, std::string("feet"), custom_colors, hue, sat, lgt, alp);
-            case 5: return GetInfo(skinname, std::string("eyes"), custom_colors, hue, sat, lgt, alp);
-            default: return "standard";
-        }
+        GetInfo(filename, skinname, std::string(partnames[part]), custom_colors, color);
     }
 
 
 private:
-    std::string GetInfo(std::string skinname, std::string part, bool& custom_colors, int& hue, int& sat, int& lgt, int& alp)
+    void GetInfo(char* filename, std::string skinname, std::string part, bool& custom_colors, int& color)
     {
-        nlohmann::json j = skins[skinname]["skin"];
+        nlohmann::json& j = skins[skinname]["skin"];
         if(j.is_object())
         {
-            nlohmann::json k = j[part];
+            nlohmann::json& k = j[part];
             if(k.is_object())
             {
                 std::string custom_colors_str = k.value("custom_colors", "false");
                 custom_colors = (custom_colors_str == "true");
+
+                int hue, sat, lgt, alp;
                 hue = k.value("hue", 0);
                 sat = k.value("sat", 0);
-                lgt = k.value("lgt", 0);
+                lgt = part == "marking" ? 0 : k.value("lgt", 0);
                 alp = k.value("alp", 255);
-                return k["filename"];
+
+                color = (color&0xFF00FFFF) | (hue << 16);
+                color = (color&0xFFFF00FF) | (sat << 8);
+                color = (color&0xFFFFFF00) | lgt;
+                color = (color&0x00FFFFFF) | (alp << 24);
+
+                std::string fname = k["filename"];
+                fname.resize(24);
+                std::strcpy(filename, fname.c_str());
+                return;
             }
         }
-        return "standard";
+        std::string fname("standard");
+        fname.resize(24);
+        std::strcpy(filename, fname.c_str());
     }
 
     void ReadSkin(std::string& skin)
@@ -74,7 +78,7 @@ private:
             nlohmann::json j;
             i >> j;
             skins[skin] = j;
-            m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "json", "success");
+            //m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "json", "success");
         }
         else
         {
@@ -84,6 +88,7 @@ private:
 
     std::map<std::string, nlohmann::json> skins;
     IConsole* m_pConsole;
+    const char* const partnames[6] = {"body", "marking", "decoration", "hands", "feet", "eyes"};
 };
 
 #endif // GAME_SERVER_SKINREADER_H
