@@ -1,13 +1,13 @@
 # Teeworlds-Zod2
 ## Description
 Zod is a Zombie-Mod for the retro-multiplayergame [Teeworlds](www.teeworlds.com).
-It if written for teeworlds 0.7 and supports 60 zombies and 4 players.
-The Mod supports a big variance of zombie-types.
+It is written for teeworlds 0.7 and supports 60 zombies and 4 players at once.
+The mod supports a big variance of zombie-types.
 
-After (re-)starting the game the mod beginns sending the first wave. After the player has defeated the first wave, a warmup starts and the next wave beginns.
+After (re-)starting the game the mod beginns sending the first wave. After the player has defeated the first wave, a warmup starts and the next wave begins.
 The waves get more difficult the more you progress, because more zombie-types are added to the waves.
 
-If you die, the **team** loses one if its lifes.
+If you die, the **team** loses one of its lifes.
 
 The game is over, after all teamlifes are gone.
 
