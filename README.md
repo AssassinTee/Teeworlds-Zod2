@@ -33,7 +33,7 @@ Waves are configurable with .json files. Teeworlds already uses a json reader fo
 * You can't change the filename or location of the top5 files
 
 Example wave-configurations:
-```
+```JSON
 {
   "Version": "1.0.0",
   "Waves": {
@@ -54,7 +54,7 @@ Example wave-configurations:
 
 Full wave-object example:
 
-```
+```JSON
     "13": {
       "Zaster": 2,
       "Zaby": 10,
