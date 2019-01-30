@@ -14,4 +14,4 @@ scripts/work/
 _test.exe
 *_srv
 autoexec.cfg
-.zip
+*.zip
