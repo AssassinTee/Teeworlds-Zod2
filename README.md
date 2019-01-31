@@ -1,7 +1,9 @@
 # Teeworlds-Zod2
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
+
 ## Description
 Zod is a Zombie-Mod for the retro-multiplayergame [Teeworlds](www.teeworlds.com).
-It is written for teeworlds 0.7 and supports 60 zombies and 4 players at once.
+It is written for Teeworlds 0.7 and supports 60 zombies and 4 players at once.
 The mod supports a big variance of zombie-types.
 
 After (re-)starting the game the mod beginns sending the first wave. After the player has defeated the first wave, a warmup starts and the next wave begins.
@@ -11,7 +13,7 @@ If you die, the **team** loses one of its lifes.
 
 The game is over, after all teamlifes are gone.
 
-## Compile and Run
+## Getting Started
 * clone this repository
 
 * compile the game the same way, you [compile default Teeworlds](https://www.teeworlds.com/?page=docs&wiki=compiling_everything). Remember, that this mod is written for **Teeworlds 0.7.x**. You only need the server, so use the command `<path>/bam conf=release server` for compiling
@@ -71,6 +73,15 @@ Full wave-object example:
       "Zeater": 10
     }
 ```
+## Contributing
+
+Feel free to contribute! In the current project state every feedback is usefull
+
+## Built With
+* [nlohmann/json](https://github.com/nlohmann/json) - JSON for Modern C++, version 3.5.0
+
+## License
+This project is licensed under the GPLv3, as every Teeworlds code should be - see [license.txt](https://github.com/AssassinTee/Teeworlds-Zod2/blob/master/license.txt) file for details
 
 ## Great Thanks to
 * nlohmann for his great [json library](https://github.com/nlohmann/json)
