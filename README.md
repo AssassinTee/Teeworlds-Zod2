@@ -1,4 +1,5 @@
 # Teeworlds-Zod2
+[![CircleCI](https://circleci.com/gh/AssassinTee/Teeworlds-Zod2.svg?style=svg)](https://circleci.com/gh/AssassinTee/Teeworlds-Zod2)
 [![release version](https://img.shields.io/badge/release-v1.0.1-blue.svg)](https://github.com/AssassinTee/Teeworlds-Zod2/releases)
 ![Teeworlds version](https://img.shields.io/badge/Teeworlds-0.7.1-brightgreen.svg)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/AssassinTee/Teeworlds-Zod2/issues)
@@ -93,3 +94,4 @@ This project is licensed under the GPLv3, as every Teeworlds code should be - se
 
 ## Great Thanks to
 * nlohmann for his great [json library](https://github.com/nlohmann/json)
+* CircleCI integration is awesome, thank you Teeworlds devs!
