@@ -1,5 +1,6 @@
 # Teeworlds-Zod2
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
+[Teeworlds version](https://img.shields.io/badge/Teeworlds-0.7.1-brightgreen.svg)
 [![HitCount](http://hits.dwyl.io/AssassinTee/Teeworlds-Zod2.svg)](http://hits.dwyl.io/AssassinTee/Teeworlds-Zod2)
 _"HITS - How Idiots Track Success"_
 
@@ -81,6 +82,10 @@ Feel free to contribute! In the current project state every feedback is usefull
 
 ## Built With
 * [nlohmann/json](https://github.com/nlohmann/json) - JSON for Modern C++, version 3.5.0
+
+## Authors
+
+* **AssassinTee** - Everything
 
 ## License
 This project is licensed under the GPLv3, as every Teeworlds code should be - see [license.txt](https://github.com/AssassinTee/Teeworlds-Zod2/blob/master/license.txt) file for details
