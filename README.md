@@ -1,5 +1,7 @@
 # Teeworlds-Zod2
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
+[![HitCount](http://hits.dwyl.io/AssassinTee/Teeworlds-Zod2.svg)](http://hits.dwyl.io/AssassinTee/Teeworlds-Zod2)
+_"HITS - How Idiots Track Success"_
 
 ## Description
 Zod is a Zombie-Mod for the retro-multiplayergame [Teeworlds](www.teeworlds.com).
