@@ -1,6 +1,7 @@
 # Teeworlds-Zod2
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/AssassinTee/Teeworlds-Zod2/issues)
+[![release version](https://img.shields.io/badge/release-v1.0.1-blue.svg)](https://github.com/AssassinTee/Teeworlds-Zod2/releases)
 ![Teeworlds version](https://img.shields.io/badge/Teeworlds-0.7.1-brightgreen.svg)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/AssassinTee/Teeworlds-Zod2/issues)
 [![HitCount](http://hits.dwyl.io/AssassinTee/Teeworlds-Zod2.svg)](http://hits.dwyl.io/AssassinTee/Teeworlds-Zod2)
 > _"HITS - How Idiots Track Success"_
 
