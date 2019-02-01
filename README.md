@@ -1,7 +1,7 @@
 # Teeworlds-Zod2
 [![CircleCI](https://circleci.com/gh/AssassinTee/Teeworlds-Zod2.svg?style=shield)](https://circleci.com/gh/AssassinTee/Teeworlds-Zod2)
 [![release version](https://img.shields.io/badge/release-v1.0.1-blue.svg)](https://github.com/AssassinTee/Teeworlds-Zod2/releases)
-[![CodeFactor](https://www.codefactor.io/repository/github/assassintee/teeworlds-zod2/badge)](https://www.codefactor.io/repository/github/assassintee/teeworlds-zod2)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c132571702c4443286ab6df0e5904014)](https://www.codacy.com/app/AssassinTee/Teeworlds-Zod2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=AssassinTee/Teeworlds-Zod2&amp;utm_campaign=Badge_Grade)
 ![Teeworlds version](https://img.shields.io/badge/Teeworlds-0.7.1-brightgreen.svg)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/AssassinTee/Teeworlds-Zod2/issues)
 [![HitCount](http://hits.dwyl.io/AssassinTee/Teeworlds-Zod2.svg)](http://hits.dwyl.io/AssassinTee/Teeworlds-Zod2)
@@ -20,8 +20,8 @@ If you die, the **team** loses one of its lifes.
 The game is over, after all teamlifes are gone.
 
 ## Getting Started
-* clone this repository
 
+* clone this repository
 * compile the game the same way, you [compile default Teeworlds](https://www.teeworlds.com/?page=docs&wiki=compiling_everything). Remember, that this mod is written for **Teeworlds 0.7.x**. You only need the server, so use the command `<path>/bam conf=release server` for compiling
 
 * start the server with
@@ -34,6 +34,7 @@ Binaries will be found in a later stage of this project.
 You may want to take a look at the variables of this gamemode.
 
 ## Configure
+
 Waves are configurable with .json files. Teeworlds already uses a json reader for the skin files, but I added another json-reader.
 * `example_wave.json` is default wavefile
 * with `sv_wave_file <your wave file>` you can change the wave configuration file
