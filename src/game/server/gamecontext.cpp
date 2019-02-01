@@ -714,7 +714,7 @@ void CGameContext::OnClientEnter(int ClientID)
 {
     if(ClientID >=4)
         return;
-    if(!m_pController->m_Wave)
+    if(!m_pController->GetWaveHandler()->GetWave())
     {
 
         m_pController->SetTeamscore(TEAM_BLUE, 0);
@@ -861,7 +861,7 @@ void CGameContext::OnZombieKill(int VictimID, int KillerID)
             delete m_apPlayers[VictimID];
 
         m_apPlayers[VictimID] = 0;
-        m_pController->DescreaseZombLeft();
+        m_pController->GetWaveHandler()->OnZombieKill();
 
         //Stats
         m_pController->GetTopFive()->IncreaseKills();
@@ -869,7 +869,7 @@ void CGameContext::OnZombieKill(int VictimID, int KillerID)
     else
     {
         m_pController->SetTeamscore(TEAM_RED, m_pController->GetTeamscore(TEAM_RED)-1);
-        m_pController->DoLifeMessage(m_pController->GetTeamscore(TEAM_RED));
+        m_pController->GetWaveHandler()->DoLifeMessage(m_pController->GetTeamscore(TEAM_RED));
     }
     //Stats
     if(KillerID >= 0 && KillerID < 4)
@@ -890,7 +890,7 @@ void CGameContext::OnClientConnected(int ClientID, bool Dummy)
     if(ClientID >= 4)
         return;
 
-    if(!m_pController->m_Wave)//let the round start
+    if(!m_pController->GetWaveHandler()->GetWave())//let the round start
 	{
 		m_pController->DoWarmup(g_Config.m_SvWarmup);
 		m_pController->SetTeamscore(TEAM_BLUE, 0);

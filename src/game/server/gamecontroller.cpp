@@ -12,7 +12,7 @@
 #include "top5/topfivejson.h"
 
 
-IGameController::IGameController(CGameContext *pGameServer)
+IGameController::IGameController(CGameContext *pGameServer) : m_CWave(pGameServer)
 {
 	m_pGameServer = pGameServer;
 	m_pServer = m_pGameServer->Server();
@@ -52,10 +52,9 @@ IGameController::IGameController(CGameContext *pGameServer)
 	m_aNumSpawnPoints[1] = 0;
 	m_aNumSpawnPoints[2] = 0;
 
-	m_Wave = 0;
 	m_pTopFive = new CTopFiveJson(g_Config.m_SvLives, g_Config.m_SvMap);
 	m_CWave.ReadFile(g_Config.m_SvWaveFile);
-	mem_zero(m_Zombie, sizeof(m_Zombie));
+	//mem_zero(m_Zombie, sizeof(m_Zombie));
 }
 
 //activity
@@ -64,7 +63,7 @@ void IGameController::DoActivityCheck()
 	if(g_Config.m_SvInactiveKickTime == 0)
 		return;
 
-	for(int i = 0; i < MAX_CLIENTS; ++i)
+	for(int i = 0; i < 4; ++i)
 	{
 		if(GameServer()->m_apPlayers[i] && !GameServer()->m_apPlayers[i]->IsDummy() && (GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS || g_Config.m_SvInactiveKick > 0) &&
 			!Server()->IsAuthed(i) && (GameServer()->m_apPlayers[i]->m_InactivityTickCounter > g_Config.m_SvInactiveKickTime*Server()->TickSpeed()*60))
@@ -654,10 +653,7 @@ void IGameController::SetGameStateEndMatch(EGameState GameState, int Timer)
         m_GameStateTimer = Timer*Server()->TickSpeed();
         m_SuddenDeath = 0;
         GameServer()->m_World.m_Paused = true;
-        for(size_t i = 0; i < sizeof(m_Zombie)/sizeof(m_Zombie[0]); ++i)
-        {
-            m_Zombie[i] = 0;
-        }
+        m_CWave.ClearZombies();
         SaveTopFive();
     }
 }
@@ -700,8 +696,7 @@ void IGameController::StartMatch()
     for(int i = 4; i < MAX_CLIENTS; i++)//bugfix
         GameServer()->OnZombieKill(i, -1);
     m_aTeamscore[TEAM_RED] = g_Config.m_SvLives;
-    m_Wave=1;
-    StartWave(m_Wave);
+    m_CWave.StartWave();
 }
 
 void IGameController::StartRound()
@@ -771,7 +766,7 @@ void IGameController::Snap(int SnappingClient)
 		if(!pGameDataTeam)
 			return;
 
-		m_aTeamscore[TEAM_BLUE] = m_ZombLeft;
+		m_aTeamscore[TEAM_BLUE] = m_CWave.GetZombAlive();
         pGameDataTeam->m_TeamscoreRed = m_aTeamscore[TEAM_RED];
 		pGameDataTeam->m_TeamscoreBlue = m_aTeamscore[TEAM_BLUE];
 	}
@@ -876,8 +871,7 @@ void IGameController::OnGameTimer()
             break;
         case IGS_NEXT_WAVE:
             // unpause the game
-            m_Wave++;
-            StartWave(m_Wave);
+            m_CWave.StartWave();
             SetGameState(IGS_GAME_RUNNING);
             break;
     }
@@ -1242,29 +1236,13 @@ int IGameController::GetStartTeam()
 	return TEAM_SPECTATORS;
 }
 
-void IGameController::StartWave(int Wave)
+/*void IGameController::StartWave(int Wave)
 {
-	if(!Wave)//Well, just in case ^^ shouldn't be needed
-		return;
-	//Zaby, Zaby has no alround wave
-	/*else if(Wave == 1)
-		m_Zombie[0] = 10;
-	else if(Wave == 2)
-		m_Zombie[0] = 40;
-	else
-		SetWaveAlg(Wave%3, Wave/3);*/
     std::vector<int> zomb_nums = m_CWave.GetZombNum(Wave);
     for(int i = 0; i < (int)(sizeof(m_Zombie)/sizeof(m_Zombie[0])); i++)
     {
         m_Zombie[i] = zomb_nums[i];
     }
-    /*
-    m_Zombie[ZINJA-1] = 10;
-    m_Zombie[ZASTER-1] = 1;
-    m_Zombie[ZAMER-1] = 1;
-    m_Zombie[ZUNNER-1] = 1;
-    m_Zombie[ZEATER-1] = 1;*/
-    //m_Zombie[ZAMER-1] = 5;
 
 	//Message Shit
 	m_ZombLeft = 0;
@@ -1272,38 +1250,22 @@ void IGameController::StartWave(int Wave)
 		m_ZombLeft += m_Zombie[i];
 
 	DoZombMessage(0);
-}
+}*/
 
 void IGameController::CheckZombie()
 {
-	if(m_GameState == IGS_WARMUP_GAME || m_GameState == IGS_WARMUP_USER || !m_Wave || EndWave())
+	if(m_GameState == IGS_WARMUP_GAME || m_GameState == IGS_WARMUP_USER || !m_CWave.GetWave() || EndWave())
 		return;
 	for(int i = 4; i < 64; i++)//i = 4, 0 a. 1 a. 2 a. 3 reserved
 	{
 		if(!GameServer()->m_apPlayers[i])//Check if the CID is free
 		{
-			int Random = RandZomb();
+			int Random = m_CWave.GetRandZombie();
 			if(Random == -1)
 				break;
 			GameServer()->OnZombie(i, Random+1);//Create a Zombie Finally
-			m_Zombie[Random]--;
 		}
 	}
-}
-
-int IGameController::RandZomb()
-{
-	int size = (int)(sizeof(m_Zombie)/sizeof(m_Zombie[0]));
-	int Rand = rand()%size;
-	int WTF = g_Config.m_SvMaxZombieSpawn;//dont make it to high, can cause bad cpu
-	while(!m_Zombie[Rand])
-	{
-		Rand = rand()%size;
-		WTF--;
-		if(!WTF) // Anti 100% CPU :D (Very crappy, but it's a fix :P)
-			return -1;
-	}
-	return Rand;
 }
 
 bool IGameController::EndWave()
@@ -1317,141 +1279,23 @@ bool IGameController::EndWave()
             break;
 		}
 	}
-	if(k != -1) {
+	if(k != -1) {//No player here
         for(int i = 4; i < 64; i++)
             GameServer()->OnZombieKill(i, -1);
         //HandleTop();
-        m_Wave = 0;
+        m_CWave.Reset();
         return true;
     }
-	for(int j = 0; j < (int)(sizeof(m_Zombie)/sizeof(m_Zombie[0])); j++)
-	{
-		if(m_Zombie[j])
-			return false;
-	}
-	for(int i = 4; i < 64; i++)
-	{
-		if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS)
-			return false;
-	}
-	/*if(m_GameState != IGS_START_COUNTDOWN) {
-        SetGameState(IGS_START_COUNTDOWN, g_Config.m_SvZombWarmup);
-    }*/
-    //DoWarmup(g_Config.m_SvZombWarmup);
-    //StartMatch();
+	if(m_CWave.GetZombAlive())
+        return false;
+
     SetGameState(IGS_NEXT_WAVE, g_Config.m_SvZombWarmup);
-    //SetGameState(IGS_END_ROUND, g_Config.m_SvZombWarmup);
 	return true;
-}
-
-void IGameController::DoZombMessage(int Which)
-{
-	char aBuf[64];
-	if(!Which)
-	{
-		str_format(aBuf, sizeof(aBuf), "Wave %d started with %d Zombies!", m_Wave, m_ZombLeft);
-		GameServer()->SendBroadcast(aBuf, -1);
-		return;
-	}
-	Which -= 1;
-	if(Which > 1 && (Which <= 5 || !(Which%10)))
-	{
-		str_format(aBuf, sizeof(aBuf), "Wave %d: %d zombies are left", m_Wave, Which);
-		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
-	}
-	else if(Which == 1)
-	{
-		str_format(aBuf, sizeof(aBuf), "Wave %d: 1 zombie is left", m_Wave);
-		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
-	}
-}
-
-void IGameController::DoLifeMessage(int Life)
-{
-	char aBuf[64];
-	if(Life > 1 && (Life <= 5 || !(Life%10)))
-	{
-		if(Life <= 10)
-		{
-			str_format(aBuf, sizeof(aBuf), "Only %d lifes left!", Life);
-			GameServer()->SendBroadcast(aBuf, -1);
-			GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-		}
-		else
-		{
-			str_format(aBuf, sizeof(aBuf), "%d lifes left!", Life);
-			GameServer()->SendBroadcast(aBuf, -1);
-			GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-		}
-	}
-	else if(Life == 1)
-	{
-		str_format(aBuf, sizeof(aBuf), "!!!Only 1 life left!!!", Life);
-		GameServer()->SendBroadcast(aBuf, -1);
-		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-	}
-}
-
-void IGameController::SetWaveAlg(int modulus, int wavedrittel)
-{
-	if(wavedrittel > 11)//endless Waves, but exponentiell Zombie code
-	{
-		for(int i = 0; i < (int)(sizeof(m_Zombie)/sizeof(m_Zombie[0])); i++)
-			m_Zombie[i] = m_Wave - 35;//3 mal wavedrittel + modulus 2
-		return;
-	}
-
-	if(!modulus)//10ner Wave
-	{
-		m_Zombie[GetZombieReihenfolge(wavedrittel)] = 10;
-	}
-	else if(modulus == 1)//40er wave
-	{
-		m_Zombie[GetZombieReihenfolge(wavedrittel)] = 40;
-	}
-	else if(modulus == 2)
-	{
-		for(int i = 0; i <= wavedrittel; i++)
-		{
-			m_Zombie[GetZombieReihenfolge(i)] = 10;
-		}
-	}
-}
-
-int IGameController::GetZombieReihenfolge(int wavedrittel)//Was heißt Riehenfolge auf englisch ...
-{
-	//sehr unschön, man müsste die Zombies neu sortieren was ein haufen arbeit ist
-	if(!wavedrittel)
-		return 0;
-	else if(wavedrittel == 1)
-		return 2;
-	else if(wavedrittel == 2)
-		return 3;
-	else if(wavedrittel == 3)
-		return 4;
-	else if(wavedrittel == 4)
-		return 6;
-	else if(wavedrittel == 5)
-		return 5;
-	else if(wavedrittel == 6)
-		return 7;
-	else if(wavedrittel == 7)
-		return 8;
-	else if(wavedrittel == 8)
-		return 9;
-	else if(wavedrittel == 9)
-		return 10;
-	else if(wavedrittel == 10)
-		return 11;
-	else if(wavedrittel == 11)
-		return 1;
-	else//shouldnt be needed
-		return 0;
 }
 
 void IGameController::SaveTopFive()
 {
-    m_pTopFive->SetWave(m_Wave);
+    m_pTopFive->SetWave(m_CWave.GetWave());
     for(int i = 0; i < 4; ++i)
     {
         if(Server()->ClientIngame(i))

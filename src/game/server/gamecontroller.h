@@ -239,27 +239,25 @@ public:
 	int GetStartTeam();
 
 	//Zomb2
-	int m_Wave;
-	int m_Zombie[13];//not sure about the amount of zombies
-	int m_ZombLeft;
+	//int m_Wave;
+	//int m_Zombie[13];//not sure about the amount of zombies
+	//int m_ZombLeft;
 
 	void StartWave(int Wave);
 	void CheckZombie();
-	int RandZomb();
+	//int RandZomb();
 	bool EndWave();
-	void DoZombMessage(int Which);
-	void DoLifeMessage(int Life);
 	void HandleTop();
-	void SetWaveAlg(int modulus, int wavedrittel);
-	int GetZombieReihenfolge(int wavedrittel);
+	//void SetWaveAlg(int modulus, int wavedrittel);
+	//int GetZombieReihenfolge(int wavedrittel);
 
 	//int m_aTeamscore[2];//To set the new round in gamecontext
     //int GetConfigLife() {return m_NoCheatLife; }
-    void DescreaseZombLeft() {m_ZombLeft--;}
     void SetTeamscore(int team, int score){m_aTeamscore[team] = score;}
     int GetTeamscore(int team) {return m_aTeamscore[team];}
 
     ITopFive* GetTopFive() {return m_pTopFive;}
+    CWave* GetWaveHandler() {return &m_CWave;}
 };
 
 #endif
