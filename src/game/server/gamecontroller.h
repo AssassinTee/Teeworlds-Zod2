@@ -75,6 +75,8 @@ class IGameController
 	void StartMatch();
 	void StartRound();
 
+	void OnGameTimer();
+
 	// map
 	char m_aMapWish[128];
 

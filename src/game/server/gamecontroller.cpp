@@ -309,13 +309,10 @@ void IGameController::OnFlagReturn(CFlag *pFlag)
 bool IGameController::OnEntity(int Index, vec2 Pos)
 {
 	// don't add pickups in survival
-	if(m_GameFlags&GAMEFLAG_SURVIVAL)
+	if(m_GameFlags&GAMEFLAG_SURVIVAL && (Index < ENTITY_SPAWN || Index > ENTITY_SPAWN_BLUE))
 	{
-		if(Index < ENTITY_SPAWN || Index > ENTITY_SPAWN_BLUE)
-			return false;
+        return false;
 	}
-
-	int Type = -1;
 
 	switch(Index)
 	{
@@ -329,31 +326,24 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 		m_aaSpawnPoints[2][m_aNumSpawnPoints[2]++] = Pos;
 		break;
 	case ENTITY_ARMOR_1:
-		Type = PICKUP_ARMOR;
+		new CPickup(&GameServer()->m_World, PICKUP_ARMOR, Pos);
 		break;
 	case ENTITY_HEALTH_1:
-		Type = PICKUP_HEALTH;
+		new CPickup(&GameServer()->m_World, PICKUP_HEALTH, Pos);
 		break;
 	case ENTITY_WEAPON_SHOTGUN:
-		Type = PICKUP_SHOTGUN;
+		new CPickup(&GameServer()->m_World, PICKUP_SHOTGUN, Pos);
 		break;
 	case ENTITY_WEAPON_GRENADE:
-		Type = PICKUP_GRENADE;
+		new CPickup(&GameServer()->m_World, PICKUP_GRENADE, Pos);
 		break;
 	case ENTITY_WEAPON_LASER:
-		Type = PICKUP_LASER;
+		new CPickup(&GameServer()->m_World, PICKUP_LASER, Pos);
 		break;
 	case ENTITY_POWERUP_NINJA:
 		if(g_Config.m_SvPowerups)
-			Type = PICKUP_NINJA;
+            new CPickup(&GameServer()->m_World, PICKUP_NINJA, Pos);
 	}
-
-	if(Type != -1)
-	{
-		new CPickup(&GameServer()->m_World, Type, Pos);
-		return true;
-	}
-
 	return false;
 }
 
@@ -596,7 +586,6 @@ void IGameController::SetGameStateWarmupUser(EGameState GameState, int Timer)
                 m_GameState = GameState;
                 m_GameStateTimer = Timer*Server()->TickSpeed();
             }
-
         }
         else
         {
@@ -812,41 +801,7 @@ void IGameController::Tick()
 
 		if(m_GameStateTimer == 0)
 		{
-			// timer fires
-			switch(m_GameState)
-			{
-			case IGS_WARMUP_USER:
-				// end warmup
-				SetGameState(IGS_WARMUP_USER, 0);
-				break;
-			case IGS_START_COUNTDOWN:
-				// unpause the game
-				SetGameState(IGS_GAME_RUNNING);
-				break;
-			case IGS_GAME_PAUSED:
-				// end pause
-				SetGameState(IGS_GAME_PAUSED, 0);
-				break;
-			case IGS_END_ROUND:
-				StartRound();
-				break;
-			case IGS_END_MATCH:
-				// start next match
-				CycleMap();
-				m_MatchCount++;
-				StartMatch();
-				break;
-			case IGS_WARMUP_GAME:
-			case IGS_GAME_RUNNING:
-				// not effected
-				break;
-            case IGS_NEXT_WAVE:
-				// unpause the game
-                m_Wave++;
-                StartWave(m_Wave);
-				SetGameState(IGS_GAME_RUNNING);
-				break;
-            }
+            OnGameTimer();
 		}
 		else
 		{
@@ -875,27 +830,6 @@ void IGameController::Tick()
  			}
 		}
 	}
-
-	// do team-balancing (skip this in survival, done there when a round starts)
-
-	//Zomb2
-	/*if(IsTeamplay() && !(m_GameFlags&GAMEFLAG_SURVIVAL))
-	{
-		switch(m_UnbalancedTick)
-		{
-		case TBALANCE_CHECK:
-			CheckTeamBalance();
-			break;
-		case TBALANCE_OK:
-			break;
-		default:
-			if(Server()->Tick() > m_UnbalancedTick+g_Config.m_SvTeambalanceTime*Server()->TickSpeed()*60)
-				DoTeamBalance();
-		}
-	}*/
-
-
-
 	// check for inactive players
 	DoActivityCheck();
 
@@ -908,6 +842,45 @@ void IGameController::Tick()
 		else
 			DoWincheckMatch();
 	}
+}
+
+void IGameController::OnGameTimer()
+{
+    // timer fires
+    switch(m_GameState)
+    {
+        case IGS_WARMUP_USER:
+            // end warmup
+            SetGameState(IGS_WARMUP_USER, 0);
+            break;
+        case IGS_START_COUNTDOWN:
+            // unpause the game
+            SetGameState(IGS_GAME_RUNNING);
+            break;
+        case IGS_GAME_PAUSED:
+            // end pause
+            SetGameState(IGS_GAME_PAUSED, 0);
+            break;
+        case IGS_END_ROUND:
+            StartRound();
+            break;
+        case IGS_END_MATCH:
+            // start next match
+            CycleMap();
+            m_MatchCount++;
+            StartMatch();
+            break;
+        case IGS_WARMUP_GAME:
+        case IGS_GAME_RUNNING:
+            // not effected
+            break;
+        case IGS_NEXT_WAVE:
+            // unpause the game
+            m_Wave++;
+            StartWave(m_Wave);
+            SetGameState(IGS_GAME_RUNNING);
+            break;
+    }
 }
 
 // info
@@ -1417,7 +1390,6 @@ void IGameController::DoLifeMessage(int Life)
 		GameServer()->SendBroadcast(aBuf, -1);
 		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 	}
-
 }
 
 void IGameController::SetWaveAlg(int modulus, int wavedrittel)
