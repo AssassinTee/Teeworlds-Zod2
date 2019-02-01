@@ -6,7 +6,7 @@ I could totally build a skin reader here that automatically reads all skin jsons
 OR
 I hardcode them somewhere
 */
-#include "json.hpp"
+#include "engine/external/nlohmann/json.hpp"
 #include <map>
 #include <string>
 #include <vector>

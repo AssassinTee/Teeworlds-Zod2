@@ -2,7 +2,7 @@
 #define GAME_SERVER_TOPFIVEJSON_H
 
 #include "topfivebase.h"
-#include "../tools/json.hpp"
+#include "engine/external/nlohmann/json.hpp"
 
 class CTopFiveJson : public ITopFive
 {

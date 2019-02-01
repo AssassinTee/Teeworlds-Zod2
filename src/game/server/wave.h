@@ -3,7 +3,7 @@
 #define GAME_SERVER_WAVE_H
 
 //#include "player.h"//Zombie types
-#include "tools/json.hpp"//I read json files!!!
+#include "engine/external/nlohmann/json.hpp"//I read json files!!!
 #include "gamecontext.h"
 #include <vector>
 
