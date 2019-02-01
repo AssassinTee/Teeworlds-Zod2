@@ -62,6 +62,16 @@ class IGameController
 	bool HasEnoughPlayers() const { return (IsTeamplay() && m_aTeamSize[TEAM_RED] > 0 && m_aTeamSize[TEAM_BLUE] > 0) || (!IsTeamplay() && m_aTeamSize[TEAM_RED] > 1); }
 	void ResetGame();
 	void SetGameState(EGameState GameState, int Timer=0);
+
+	void SetGameStateWarmupGame(EGameState GameState, int Timer=0);
+	void SetGameStateWarmupUser(EGameState GameState, int Timer=0);
+	void SetGameStateStartCountdown(EGameState GameState, int Timer=0);
+	void SetGameStateGamePaused(EGameState GameState, int Timer=0);
+	void SetGameStateGameRunning(EGameState GameState, int Timer=0);
+	void SetGameStateEndMatch(EGameState GameState, int Timer=0);
+	void SetGameStateEndRound(EGameState GameState, int Timer=0);
+	void SetGameStateNextWave(EGameState GameState, int Timer=0);
+
 	void StartMatch();
 	void StartRound();
 

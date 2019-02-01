@@ -518,16 +518,45 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 	switch(GameState)
 	{
 	case IGS_WARMUP_GAME:
-		// game based warmup is only possible when game or any warmup is running
-		if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_WARMUP_GAME || m_GameState == IGS_WARMUP_USER)
-		{
-			if(Timer == TIMER_INFINITE)
-			{
-				// run warmup till there're enough players
-				m_GameState = GameState;
- 				m_GameStateTimer = TIMER_INFINITE;
+        SetGameStateWarmupGame(GameState, Timer);
+		break;
+	case IGS_WARMUP_USER:
+		SetGameStateWarmupUser(GameState, Timer);
+		break;
+	case IGS_START_COUNTDOWN:
+		SetGameStateStartCountdown(GameState, Timer);
+		break;
+	case IGS_GAME_RUNNING:
+		SetGameStateGameRunning(GameState, Timer);
+		break;
+	case IGS_GAME_PAUSED:
+        SetGameStateGamePaused(GameState, Timer);
+		break;
+	case IGS_END_ROUND:
+		SetGameStateEndRound(GameState, Timer);
+		if(m_GameState == IGS_END_MATCH)//this is very ugly
+			break;
+	case IGS_END_MATCH:
+		SetGameStateEndMatch(GameState, Timer);
+		break;
+	case IGS_NEXT_WAVE:
+        SetGameStateNextWave(GameState, Timer);
+        break;
+    }
+}
 
-				// enable respawning in survival when activating warmup
+void IGameController::SetGameStateWarmupGame(EGameState GameState, int Timer)
+{
+    // game based warmup is only possible when game or any warmup is running
+    if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_WARMUP_GAME || m_GameState == IGS_WARMUP_USER)
+    {
+        if(Timer == TIMER_INFINITE)
+        {
+            // run warmup till there're enough players
+            m_GameState = GameState;
+            m_GameStateTimer = TIMER_INFINITE;
+
+            // enable respawning in survival when activating warmup
 				if(m_GameFlags&GAMEFLAG_SURVIVAL)
 				{
 					for(int i = 0; i < MAX_CLIENTS; ++i)
@@ -541,117 +570,120 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 				StartMatch();
 			}
 		}
-		break;
-	case IGS_WARMUP_USER:
-		// user based warmup is only possible when the game or a user based warmup is running
-		if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_WARMUP_USER)
-		{
-			if(Timer != 0)
-			{
-				// start warmup
-				if(Timer < 0)
-				{
-					m_GameState = GameState;
-					m_GameStateTimer = TIMER_INFINITE;
-					if(g_Config.m_SvPlayerReadyMode)
-					{
-						// run warmup till all players are ready
-						SetPlayersReadyState(false);
-					}
-				}
-				else if(Timer > 0)
-				{
-					// run warmup for a specific time intervall
-					m_GameState = GameState;
-					m_GameStateTimer = Timer*Server()->TickSpeed();
-				}
+}
 
-				// enable respawning in survival when activating warmup
-				/*if(m_GameFlags&GAMEFLAG_SURVIVAL)
-				{
-					for(int i = 0; i < MAX_CLIENTS; ++i)
-						if(GameServer()->m_apPlayers[i])
-							GameServer()->m_apPlayers[i]->m_RespawnDisabled = false;
-				}*/
-			}
-			else
-			{
-				// start new match
-				StartMatch();
-			}
-		}
-		break;
-	case IGS_START_COUNTDOWN:
-		// only possible when game, pause or start countdown is running
-		if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_GAME_PAUSED || m_GameState == IGS_START_COUNTDOWN)
-		{
-			m_GameState = GameState;
-			m_GameStateTimer = 3*Server()->TickSpeed();
-			GameServer()->m_World.m_Paused = true;
-		}
-		break;
-	case IGS_GAME_RUNNING:
-		// always possible
-		{
-			m_GameState = GameState;
-			m_GameStateTimer = TIMER_INFINITE;
-			SetPlayersReadyState(true);
-			GameServer()->m_World.m_Paused = false;
-		}
-		break;
-	case IGS_GAME_PAUSED:
-		// only possible when game is running or paused
-		if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_GAME_PAUSED)
-		{
-			if(Timer != 0)
-			{
-				// start pause
-				if(Timer < 0)
-				{
-					// pauses infinitely till all players are ready or disabled via rcon command
-					m_GameStateTimer = TIMER_INFINITE;
-					SetPlayersReadyState(false);
-				}
-				else
-				{
-					// pauses for a specific time intervall
-					m_GameStateTimer = Timer*Server()->TickSpeed();
-				}
-
-				m_GameState = GameState;
-				GameServer()->m_World.m_Paused = true;
-			}
-			else
-			{
-				// start a countdown to end pause
-				SetGameState(IGS_START_COUNTDOWN);
-			}
-		}
-		break;
-	case IGS_END_ROUND:
-		DoWincheckMatch();
-		if(m_GameState == IGS_END_MATCH)
-			break;
-	case IGS_END_MATCH:
-		// only possible when game is running or over
-		if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_END_MATCH || m_GameState == IGS_END_ROUND || m_GameState == IGS_GAME_PAUSED || m_GameState == IGS_NEXT_WAVE)
-		{
-			m_GameState = GameState;
-			m_GameStateTimer = Timer*Server()->TickSpeed();
-			m_SuddenDeath = 0;
-			GameServer()->m_World.m_Paused = true;
-			for(size_t i = 0; i < sizeof(m_Zombie)/sizeof(m_Zombie[0]); ++i)
-			{
-                m_Zombie[i] = 0;
-			}
-			SaveTopFive();
-		}
-	case IGS_NEXT_WAVE:
-        if(m_GameState == IGS_GAME_RUNNING)
+void IGameController::SetGameStateWarmupUser(EGameState GameState, int Timer)
+{
+// user based warmup is only possible when the game or a user based warmup is running
+    if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_WARMUP_USER)
+    {
+        if(Timer != 0)
         {
-            m_GameState = GameState;
-            m_GameStateTimer = g_Config.m_SvZombWarmup*Server()->TickSpeed();
+            // start warmup
+            if(Timer < 0)
+            {
+                m_GameState = GameState;
+                m_GameStateTimer = TIMER_INFINITE;
+                if(g_Config.m_SvPlayerReadyMode)
+                {
+                    // run warmup till all players are ready
+                    SetPlayersReadyState(false);
+                }
+            }
+            else if(Timer > 0)
+            {
+                // run warmup for a specific time intervall
+                m_GameState = GameState;
+                m_GameStateTimer = Timer*Server()->TickSpeed();
+            }
+
         }
+        else
+        {
+            // start new match
+            StartMatch();
+        }
+    }
+}
+
+void IGameController::SetGameStateStartCountdown(EGameState GameState, int Timer)
+{
+    // only possible when game, pause or start countdown is running
+    if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_GAME_PAUSED || m_GameState == IGS_START_COUNTDOWN)
+    {
+        m_GameState = GameState;
+        m_GameStateTimer = 3*Server()->TickSpeed();
+        GameServer()->m_World.m_Paused = true;
+    }
+}
+
+void IGameController::SetGameStateGamePaused(EGameState GameState, int Timer)
+{
+    // only possible when game is running or paused
+    if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_GAME_PAUSED)
+    {
+        if(Timer != 0)
+        {
+            // start pause
+            if(Timer < 0)
+            {
+                // pauses infinitely till all players are ready or disabled via rcon command
+                m_GameStateTimer = TIMER_INFINITE;
+                SetPlayersReadyState(false);
+            }
+            else
+            {
+                // pauses for a specific time intervall
+                m_GameStateTimer = Timer*Server()->TickSpeed();
+            }
+            m_GameState = GameState;
+            GameServer()->m_World.m_Paused = true;
+        }
+        else
+        {
+            // start a countdown to end pause
+            SetGameState(IGS_START_COUNTDOWN);
+        }
+    }
+}
+
+void IGameController::SetGameStateGameRunning(EGameState GameState, int Timer)
+{
+    //always possible
+    m_GameState = GameState;
+    m_GameStateTimer = TIMER_INFINITE;
+    SetPlayersReadyState(true);
+    GameServer()->m_World.m_Paused = false;
+}
+
+void IGameController::SetGameStateEndMatch(EGameState GameState, int Timer)
+{
+    // only possible when game is running or over
+    if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_END_MATCH || m_GameState == IGS_END_ROUND || m_GameState == IGS_GAME_PAUSED || m_GameState == IGS_NEXT_WAVE)
+    {
+        m_GameState = GameState;
+        m_GameStateTimer = Timer*Server()->TickSpeed();
+        m_SuddenDeath = 0;
+        GameServer()->m_World.m_Paused = true;
+        for(size_t i = 0; i < sizeof(m_Zombie)/sizeof(m_Zombie[0]); ++i)
+        {
+            m_Zombie[i] = 0;
+        }
+        SaveTopFive();
+    }
+}
+
+void IGameController::SetGameStateEndRound(EGameState GameState, int Timer)
+{
+    DoWincheckMatch();
+}
+
+void IGameController::SetGameStateNextWave(EGameState GameState, int Timer)
+{
+    if(m_GameState == IGS_GAME_RUNNING)
+    {
+        m_GameState = GameState;
+        m_GameStateTimer = g_Config.m_SvZombWarmup*Server()->TickSpeed();
     }
 }
 
@@ -694,9 +726,6 @@ void IGameController::StartRound()
     SetGameState(IGS_START_COUNTDOWN);
 	//else
     //SetGameState(IGS_WARMUP_GAME, TIMER_INFINITE);
-
-
-
 }
 
 // general
