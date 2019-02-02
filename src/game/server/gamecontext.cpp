@@ -866,7 +866,7 @@ void CGameContext::OnZombieKill(int VictimID, int KillerID)
         //Stats
         m_pController->GetTopFive()->IncreaseKills();
     }
-    else
+    else if(KillerID >= 4)//Died by Zombie, not himself!
     {
         m_pController->SetTeamscore(TEAM_RED, m_pController->GetTeamscore(TEAM_RED)-1);
         m_pController->GetWaveHandler()->DoLifeMessage(m_pController->GetTeamscore(TEAM_RED));
