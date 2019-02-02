@@ -57,16 +57,19 @@ void CWave::StartWave()
     {
         GetEndlessWave();
     }
-
-    //Fill in wave vector
-    ClearZombies();
-    for(int i = 0; i < 13; ++i)
+    else
     {
-        int value = j.value(m_JsonZombieNames[i], 0);
-        m_vWave.push_back(value);
-        m_ZombLeft+= value;
+        //Fill in wave vector
+        ClearZombies();
+        for(int i = 0; i < 13; ++i)
+        {
+            int value = j.value(m_JsonZombieNames[i], 0);
+            m_vWave.push_back(value);
+            m_ZombLeft+= value;
+        }
+        m_ZombAlive = m_ZombLeft;
     }
-    m_ZombAlive = m_ZombLeft;
+    DoWaveStartMessage();
 }
 
 void CWave::GetEndlessWave()
@@ -109,18 +112,28 @@ void CWave::OnZombieKill()
 void CWave::DoZombMessage()
 {
     std::stringstream ss;
-	if(!m_ZombAlive)
+    if(m_ZombAlive == 0)
+    {
+        ss << "Wave " << m_Wave << " defeated!";
+    }
+	else if(m_ZombAlive <= 5 || !(m_ZombAlive%10))
 	{
-		ss << "Wave " << m_Wave << " started with " << m_ZombAlive << " Zombies!";
-		GameServer()->SendBroadcast(ss.str().c_str(), -1);
-		return;
-	}
-	if(m_ZombAlive <= 5 || !(m_ZombAlive%10))
-	{
-        ss << "Wave " << m_Wave << ": " << m_ZombAlive << "zombie"
+
+        ss << "Wave " << m_Wave << ": " << m_ZombAlive << " zombie"
             << (m_ZombAlive == 1 ? " is" : "s are") << " left";
-		GameServer()->SendChat(-1, CHAT_ALL, -1, ss.str().c_str());
 	}
+	else
+	{
+        return;
+	}
+	GameServer()->SendChat(-1, CHAT_ALL, -1, ss.str().c_str());
+}
+
+void CWave::DoWaveStartMessage()
+{
+    std::stringstream ss;
+    ss << "Wave " << m_Wave << " started with " << m_ZombAlive << " Zombies!";
+    GameServer()->SendBroadcast(ss.str().c_str(), -1);
 }
 
 void CWave::DoLifeMessage(int Life)

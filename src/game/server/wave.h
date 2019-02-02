@@ -28,13 +28,14 @@ public:
     void OnZombieKill();
     int GetZombAlive(){return m_ZombAlive;}
 
-    void DoZombMessage();
+    void DoWaveStartMessage();
 	void DoLifeMessage(int Life);
 
 private:
     CGameContext *GameServer() const { return m_pGameServer; }
     void ReadWave(std::string filename);
     void GetEndlessWave();
+    void DoZombMessage();
 
     nlohmann::json m_Json;
     const std::string m_JsonZombieNames[13];
