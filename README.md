@@ -21,19 +21,19 @@ The game is over, after all teamlifes are gone.
 
 ## Getting Started
 
-  * clone this repository
-  
-  * compile the game the same way, you [compile default Teeworlds](https://www.teeworlds.com/?page=docs&wiki=compiling_everything). Remember, that this mod is written for **Teeworlds 0.7.x**. You only need the server, so use the command `<path>/bam conf=release server` for compiling
-  
-  * start the server with
-  
+* clone this repository
+
+* compile the game the same way, you [compile default Teeworlds](https://www.teeworlds.com/?page=docs&wiki=compiling_everything). Remember, that this mod is written for **Teeworlds 0.7.x**. You only need the server, so use the command `<path>/bam conf=release server` for compiling
+
+* start the server with
+
     * Linux: `./teeworlds_srv` (It may be found under /build)
-    
+
     * Windows: doubleclick `teeworlds_srv.exe`
-    
-  * you may have to call the restart command in the admin console (of teeworlds)
-  
-  * Have Fun!
+
+* you may have to call the restart command in the admin console (of teeworlds)
+
+* Have Fun!
 
 Binaries will be found in a later stage of this project.
 You may want to take a look at the variables of this gamemode.
@@ -42,13 +42,13 @@ You may want to take a look at the variables of this gamemode.
 
 Waves are configurable with .json files. Teeworlds already uses a json reader for the skin files, but I added another json-reader.
 
-  * `example_wave.json` is default wavefile
-  
-  * with `sv_wave_file <your wave file>` you can change the wave configuration file
-  
-  * Top5 and rank statistics will always be found under `top5/` in `<mapname>.json`
-  
-  * You can't change the filename or location of the top5 files
+* `example_wave.json` is default wavefile
+
+* with `sv_wave_file <your wave file>` you can change the wave configuration file
+
+* Top5 and rank statistics will always be found under `top5/` in `<mapname>.json`
+
+* You can't change the filename or location of the top5 files
 
 Example wave-configurations:
 ```JSON
@@ -67,10 +67,10 @@ Example wave-configurations:
 ```
 
 * `Version`: The Version of the wave file. This allows backwards compatibility.
-  
-  * `Waves`: Stores the waves in key value form. The key is the wave number and the value is a json-object
-  
-  * Wave-object: **Key**: _Zombiename_, **Value**: _Zombienumber_
+
+* `Waves`: Stores the waves in key value form. The key is the wave number and the value is a json-object
+
+* Wave-object: **Key**: _Zombiename_, **Value**: _Zombienumber_
 
 Full wave-object example:
 
@@ -101,13 +101,13 @@ Feel free to contribute! In the current project state every feedback is usefull
 
 ## Authors
 
-  * **AssassinTee** - Everything
+* **AssassinTee** - Everything
 
 ## License
 This project is licensed under the GPLv3, as every Teeworlds code should be - see [license.txt](https://github.com/AssassinTee/Teeworlds-Zod2/blob/master/license.txt) file for details
 
 ## Great Thanks to
 
-  * nlohmann for his great [json library](https://github.com/nlohmann/json)
-  
+* nlohmann for his great [json library](https://github.com/nlohmann/json)
+
 * CircleCI integration is awesome, thank you Teeworlds devs!
