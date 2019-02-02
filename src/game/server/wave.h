@@ -16,7 +16,7 @@ class CWave
 public:
     CWave(class CGameContext *pGameServer);
     ~CWave();
-    void ReadFile(std::string filename);
+    void ReadFile(const std::string& filename);
     void Reset();
     void StartWave();
     int GetRandZombie();
@@ -33,7 +33,7 @@ public:
 
 private:
     CGameContext *GameServer() const { return m_pGameServer; }
-    void ReadWave(std::string filename);
+    void ReadWave(const std::string& filename);
     void GetEndlessWave();
     void DoZombMessage();
 

@@ -33,12 +33,12 @@ void CWave::ClearZombies()
     m_ZombAlive = 0;
 }
 
-void CWave::ReadFile(std::string filename)
+void CWave::ReadFile(const std::string& filename)
 {
     ReadWave(filename);
 }
 
-void CWave::ReadWave(std::string filename)
+void CWave::ReadWave(const std::string& filename)
 {
     using nlohmann::json;
     std::ifstream i(filename);
