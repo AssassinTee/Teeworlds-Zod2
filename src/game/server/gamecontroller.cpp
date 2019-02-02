@@ -1043,12 +1043,12 @@ bool IGameController::CanSpawn(int Team, vec2 *pOutPos) const
 
 		// first try own team spawn, then normal spawn and then enemy
 		EvaluateSpawnType(&Eval, 1+(Team&1));
-		if(!Eval.m_Got)
+		/*if(!Eval.m_Got)
 		{
-			EvaluateSpawnType(&Eval, 0);
-			if(!Eval.m_Got)
-				EvaluateSpawnType(&Eval, 1+((Team+1)&1));
-		}
+			EvaluateSpawnType(&Eval, 0);//Never EVER try enemy spawn
+			//if(!Eval.m_Got)
+				//EvaluateSpawnType(&Eval, 1+((Team+1)&1));
+		}*/
 	}
 	else
 	{
