@@ -25,11 +25,11 @@ struct STopFiveGameEntry
 class ITopFive
 {
 public:
-    ITopFive(int lifes, std::string mapname){
+    ITopFive(int lifes, const std::string& mapname){
         Reset(lifes, mapname);
     }
 
-    void Reset(int lifes, std::string mapname)
+    void Reset(int lifes, const std::string& mapname)
     {
         m_GameEntry.mapname = mapname;
         m_GameEntry.lifes = lifes;
@@ -52,7 +52,7 @@ public:
         m_GameEntry.wave = wave;
     }
 
-    void SetPlayerName(int index, std::string name)
+    void SetPlayerName(int index, const std::string& name)
     {
         m_GameEntry.player_entry[index].name = name;
     }
@@ -70,7 +70,7 @@ public:
 
     virtual void SaveGameEntry() = 0;
     virtual std::vector<STopFiveGameEntry> GetTopFive() = 0;
-    virtual STopFiveGameEntry& GetRank(std::string name, int& rank) = 0;
+    virtual STopFiveGameEntry& GetRank(const std::string& name, int& rank) = 0;
 
     STopFiveGameEntry& GetGameEntry() {return m_GameEntry;}
 

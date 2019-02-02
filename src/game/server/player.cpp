@@ -40,6 +40,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, int Zombie
         for(int i = 0; i < 3; ++i)
             m_aSubZomb[i] = NONE;
     }
+    m_ZombieActiveWeaponType = 0;//WEAPON_HAMMER
 }
 
 CPlayer::~CPlayer()

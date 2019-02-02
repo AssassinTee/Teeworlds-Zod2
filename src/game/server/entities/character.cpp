@@ -47,6 +47,7 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_Health = 0;
 	m_Armor = 0;
 	m_TriggeredEvents = 0;
+	m_IsVisible = true;
 }
 
 void CCharacter::Reset()

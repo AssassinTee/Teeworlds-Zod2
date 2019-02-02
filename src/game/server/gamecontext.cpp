@@ -210,7 +210,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 
     if(Mode == CHAT_ALL && (pText[0] == '!' || pText[0] == '/'))
     {
-        std::vector<std::string> commands = {"cmdlist", "info", "help", "top5", "rank"};
+        const std::vector<std::string> commands = {"cmdlist", "info", "help", "top5", "rank"};
         for(auto it = commands.begin(); it != commands.end(); ++it)
         {
             if(!str_comp(pText, ("!"+(*it)).c_str()) || !str_comp(pText, ("/"+(*it)).c_str()))
@@ -256,7 +256,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	}
 }
 
-void CGameContext::SendCommand(int ChatterClientID, std::string command)
+void CGameContext::SendCommand(int ChatterClientID, const std::string& command)
 {
 
 	std::vector<std::string> messageList;
@@ -320,7 +320,8 @@ void CGameContext::SendCommand(int ChatterClientID, std::string command)
     {
         std::stringstream ss;
         int rank;
-        STopFiveGameEntry game = m_pController->GetTopFive()->GetRank(std::string(Server()->ClientName(ChatterClientID)), rank);
+        const std::string clientname = std::string(Server()->ClientName(ChatterClientID));
+        STopFiveGameEntry game = m_pController->GetTopFive()->GetRank(clientname, rank);
         if(rank == -1)
         {
             ss << "Player '" << Server()->ClientName(ChatterClientID) << "' is not ranked yet";
@@ -1413,7 +1414,7 @@ void CGameContext::ConShuffleTeams(IConsole::IResult *pResult, void *pUserData)
 		aPlayer[i-1] = tmp;
 	}
 	//uneven Number of Players?
-	rnd = PlayerTeam % 2 ? random_int() % 2 : 0;
+	rnd = (PlayerTeam % 2) ? (random_int() % 2) : 0;
 
 	for(int i = 0; i < PlayerTeam; i++)
 		pSelf->m_pController->DoTeamChange(pSelf->m_apPlayers[aPlayer[i]], i < (PlayerTeam+rnd)/2 ? TEAM_RED : TEAM_BLUE, false);
@@ -1452,7 +1453,7 @@ void CGameContext::ConAddVote(IConsole::IResult *pResult, void *pUserData)
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 		return;
 	}
-	while(*pDescription && *pDescription == ' ')
+	while(*pDescription == ' ')
 		pDescription++;
 	if(str_length(pDescription) >= VOTE_DESC_LENGTH || *pDescription == 0)
 	{

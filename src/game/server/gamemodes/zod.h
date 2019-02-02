@@ -5,11 +5,11 @@
 class CGameControllerZOD : public IGameController
 {
 public:
-	vec2 *m_pTeleporter;
+	//vec2 *m_pTeleporter;
 
 	CGameControllerZOD(class CGameContext *pGameServer);
 
-	void InitTeleporter();
+	//void InitTeleporter();
 	//virtual void Snap(int SnappingClient);
 	//virtual void Tick();
 	virtual int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);

@@ -37,7 +37,7 @@ std::vector<STopFiveGameEntry> CTopFiveJson::GetTopFive()
     //return m_Entries;
 }
 
-STopFiveGameEntry& CTopFiveJson::GetRank(std::string name, int& rank)
+STopFiveGameEntry& CTopFiveJson::GetRank(const std::string& name, int& rank)
 {
     for(size_t j = 0; j < m_Entries.size(); ++j)
     {

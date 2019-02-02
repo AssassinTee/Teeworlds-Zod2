@@ -15,10 +15,10 @@ CGameControllerZOD::CGameControllerZOD(class CGameContext *pGameServer)
 	//InitTeleporter();
 }
 
-void CGameControllerZOD::InitTeleporter()
+/*void CGameControllerZOD::InitTeleporter()
 {
 	int ArraySize = 0;
-	/*if(GameServer()->Collision()->Layers()->TeleLayer())
+	if(GameServer()->Collision()->Layers()->TeleLayer())
 	{
 		for(int i = 0; i < GameServer()->Collision()->Layers()->TeleLayer()->m_Width*GameServer()->Collision()->Layers()->TeleLayer()->m_Height; i++)
 		{
@@ -26,7 +26,7 @@ void CGameControllerZOD::InitTeleporter()
 			if(GameServer()->Collision()->m_pTele[i].m_Number > ArraySize)
 				ArraySize = GameServer()->Collision()->m_pTele[i].m_Number;
 		}
-	}*/
+	}
 
 	if(!ArraySize)
 	{
@@ -38,12 +38,12 @@ void CGameControllerZOD::InitTeleporter()
 	mem_zero(m_pTeleporter, ArraySize*sizeof(vec2));
 
 	// assign the values
-	/*for(int i = 0; i < GameServer()->Collision()->Layers()->TeleLayer()->m_Width*GameServer()->Collision()->Layers()->TeleLayer()->m_Height; i++)
+	for(int i = 0; i < GameServer()->Collision()->Layers()->TeleLayer()->m_Width*GameServer()->Collision()->Layers()->TeleLayer()->m_Height; i++)
 	{
 		if(GameServer()->Collision()->m_pTele[i].m_Number > 0 && GameServer()->Collision()->m_pTele[i].m_Type == TILE_TELEOUT)
 			m_pTeleporter[GameServer()->Collision()->m_pTele[i].m_Number-1] = vec2(i%GameServer()->Collision()->Layers()->TeleLayer()->m_Width*32+16, i/GameServer()->Collision()->Layers()->TeleLayer()->m_Width*32+16);
-	}*/
-}
+	}
+}*/
 
 int CGameControllerZOD::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon)
 {

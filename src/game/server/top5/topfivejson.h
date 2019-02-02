@@ -7,13 +7,13 @@
 class CTopFiveJson : public ITopFive
 {
 public:
-    CTopFiveJson(int lifes, std::string mapname) : ITopFive(lifes, mapname){
+    CTopFiveJson(int lifes, const std::string& mapname) : ITopFive(lifes, mapname){
         ReadJsonFile();
     }
 
     void SaveGameEntry() override;
     std::vector<STopFiveGameEntry> GetTopFive() override;
-    STopFiveGameEntry& GetRank(std::string name, int& rank) override;
+    STopFiveGameEntry& GetRank(const std::string& name, int& rank) override;
 private:
     void ReadJsonFile();
     void SaveJsonFile();

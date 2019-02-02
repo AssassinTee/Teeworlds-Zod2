@@ -135,7 +135,7 @@ public:
 	// network
 	void SendChat(int ChatterClientID, int Mode, int To, const char *pText);
     //Zomb
-	void SendCommand(int ChatterClientID, std::string command);
+	void SendCommand(int ChatterClientID, const std::string& command);
 	void SendBroadcast(const char *pText, int ClientID);
 	void SendEmoticon(int ClientID, int Emoticon);
 	void SendWeaponPickup(int ClientID, int Weapon);
