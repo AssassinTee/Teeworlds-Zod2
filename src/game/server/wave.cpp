@@ -112,7 +112,9 @@ void CWave::OnZombieKill()
 void CWave::DoZombMessage()
 {
     std::stringstream ss;
-    if(m_ZombAlive == 0)
+    if(m_ZombAlive < 0)
+        return;
+    else if(m_ZombAlive == 0)
     {
         ss << "Wave " << m_Wave << " defeated!";
     }
