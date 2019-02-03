@@ -111,6 +111,7 @@ class IGameController
 	ITopFive* m_pTopFive;
 
 	void SaveTopFive();
+	void DespawnZombies(bool every_zomb);
 
 protected:
 	CGameContext *GameServer() const { return m_pGameServer; }

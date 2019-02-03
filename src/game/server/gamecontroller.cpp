@@ -653,9 +653,9 @@ void IGameController::SetGameStateEndMatch(EGameState GameState, int Timer)
         m_GameState = GameState;
         m_GameStateTimer = Timer*Server()->TickSpeed();
         m_SuddenDeath = 0;
+        SaveTopFive();
         GameServer()->m_World.m_Paused = true;
         m_CWave.ClearZombies();
-        SaveTopFive();
     }
 }
 
@@ -694,8 +694,7 @@ void IGameController::StartMatch()
 	str_format(aBuf, sizeof(aBuf), "start match type='%s' teamplay='%d'", m_pGameType, m_GameFlags&GAMEFLAG_TEAMS);
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
-    for(int i = 4; i < MAX_CLIENTS; i++)//bugfix
-        GameServer()->OnZombieKill(i, -1);
+    DespawnZombies(true);
     m_aTeamscore[TEAM_RED] = g_Config.m_SvLives;
     m_CWave.Reset();
     m_CWave.StartWave();
@@ -817,10 +816,13 @@ void IGameController::Tick()
 				// freeze the game
 				++m_GameStartTick;
 				break;
+            case IGS_END_MATCH:
+			case IGS_END_ROUND:
+                DespawnZombies(false);
+                break;
 			case IGS_WARMUP_GAME:
 			case IGS_GAME_RUNNING:
-			case IGS_END_MATCH:
-			case IGS_END_ROUND:
+
 			case IGS_NEXT_WAVE:
 				// not effected
 				break;
@@ -1258,10 +1260,13 @@ void IGameController::CheckZombie()
 {
 	if(m_GameState == IGS_WARMUP_GAME || m_GameState == IGS_WARMUP_USER || !m_CWave.GetWave() || EndWave())
 		return;
-	for(int i = 4; i < 64; i++)//i = 4, 0 a. 1 a. 2 a. 3 reserved
+
+    int counter = 0;
+	for(int i = 4; i < 64 && counter < g_Config.m_SvMaxZombieSpawn; i++)//i = 4, 0 a. 1 a. 2 a. 3 reserved//limit zombies spawning per tick
 	{
 		if(!GameServer()->m_apPlayers[i])//Check if the CID is free
 		{
+            counter++;
 			int Random = m_CWave.GetRandZombie();
 			if(Random == -1)
 				break;
@@ -1282,8 +1287,7 @@ bool IGameController::EndWave()
 		}
 	}
 	if(k != -1) {//No player here
-        for(int i = 4; i < 64; i++)
-            GameServer()->OnZombieKill(i, -1);
+        DespawnZombies(true);
         //HandleTop();
         m_CWave.Reset();
         return true;
@@ -1307,4 +1311,23 @@ void IGameController::SaveTopFive()
     }
     m_pTopFive->SaveGameEntry();
     m_pTopFive->Reset(g_Config.m_SvLives, g_Config.m_SvMap);
+}
+
+void IGameController::DespawnZombies(bool every_zomb)
+{
+    int counter = 0;
+    for(int i = 4; i < 64; i++)
+    {
+        if(GameServer()->DisconnectZombie(i))
+        {
+            counter++;
+            char aBuf[128];
+            str_format(aBuf, sizeof(aBuf), "trying to despawn zombie %d on tick %d", i, Server()->Tick());
+            GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", aBuf);
+            if(!every_zomb && counter >= g_Config.m_SvMaxZombieDespawn)
+            {
+                return;
+            }
+        }
+    }
 }
