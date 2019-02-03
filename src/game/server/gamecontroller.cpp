@@ -680,7 +680,7 @@ void IGameController::StartMatch()
 	m_RoundCount = 0;
 	m_aTeamscore[TEAM_RED] = g_Config.m_SvLives;
 	m_aTeamscore[TEAM_BLUE] = 0;
-	m_pTopFive->GetGameEntry().lifes = g_Config.m_SvLives;
+	m_pTopFive->Reset(g_Config.m_SvLives, std::string(g_Config.m_SvMap));
 
 	// start countdown if there're enough players, otherwise do warmup till there're
 	//if(HasEnoughPlayers())
@@ -697,6 +697,7 @@ void IGameController::StartMatch()
     for(int i = 4; i < MAX_CLIENTS; i++)//bugfix
         GameServer()->OnZombieKill(i, -1);
     m_aTeamscore[TEAM_RED] = g_Config.m_SvLives;
+    m_CWave.Reset();
     m_CWave.StartWave();
 }
 
