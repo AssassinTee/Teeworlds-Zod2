@@ -47,6 +47,9 @@ CCharacter::CCharacter(CGameWorld *pWorld) : CEntity(pWorld, CGameWorld::ENTTYPE
 	m_Armor = 0;
 	m_TriggeredEvents = 0;
 	m_IsVisible = true;
+	m_Aim.m_Angle = 0;
+	m_Aim.m_Explode = false;
+	m_Aim.m_FireCounter = 0;
 }
 
 void CCharacter::Reset()
