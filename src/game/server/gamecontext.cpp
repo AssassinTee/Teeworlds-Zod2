@@ -789,9 +789,9 @@ void CGameContext::OnClientEnter(int ClientID)
 
 void CGameContext::OnZombie(int ClientID, int Zomb)
 {
-    char bBuf[128];
+    /*char bBuf[128];
     str_format(bBuf, sizeof(bBuf), "Create zombie of type '%d'", Zomb);
-    Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", bBuf);
+    Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", bBuf);*/
 	if(ClientID >= 64) //|| //m_apPlayers[ClientID])
 			return;
     m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, false, Zomb);
@@ -803,8 +803,8 @@ void CGameContext::OnZombie(int ClientID, int Zomb)
 	NewClientInfoMsg.m_Team = m_apPlayers[ClientID]->GetTeam();
 	NewClientInfoMsg.m_pName = m_apPlayers[ClientID]->GetZombieName(Zomb);
 
-    str_format(bBuf, sizeof(bBuf), "Zombiename '%s'", m_apPlayers[ClientID]->GetZombieName(Zomb));
-    Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", bBuf);
+    str_format(bBuf, sizeof(bBuf), "Spawned zombie of type '%s'", m_apPlayers[ClientID]->GetZombieName(Zomb));
+    Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "zombie", bBuf);
 
 	NewClientInfoMsg.m_pClan = "Zombie";
 	NewClientInfoMsg.m_Country = 0;
