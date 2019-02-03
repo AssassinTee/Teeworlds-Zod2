@@ -42,7 +42,17 @@ void CWave::ReadWave(const std::string& filename)
 {
     using nlohmann::json;
     std::ifstream i(filename);
-    i >> m_Json;
+    if(i.is_open())
+    {
+        i >> m_Json;
+        i.close();
+    }
+    else
+    {
+        std::stringstream ss;
+        ss << "could not open file '" << filename << "'!";
+        GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "json", ss.str().c_str());
+    }
 }
 
 void CWave::StartWave()
