@@ -803,6 +803,7 @@ void CGameContext::OnZombie(int ClientID, int Zomb)
 	NewClientInfoMsg.m_Team = m_apPlayers[ClientID]->GetTeam();
 	NewClientInfoMsg.m_pName = m_apPlayers[ClientID]->GetZombieName(Zomb);
 
+    char aBuf[64];
     str_format(bBuf, sizeof(bBuf), "Spawned zombie of type '%s'", m_apPlayers[ClientID]->GetZombieName(Zomb));
     Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "zombie", bBuf);
 
