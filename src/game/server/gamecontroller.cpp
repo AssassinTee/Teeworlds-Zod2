@@ -53,7 +53,7 @@ IGameController::IGameController(CGameContext *pGameServer) : m_CWave(pGameServe
 	m_aNumSpawnPoints[2] = 0;
 
     std::string svmap(g_Config.m_SvMap);
-	m_pTopFive = new CTopFiveJson(g_Config.m_SvLives, svmap);
+	m_pTopFive = new CTopFiveJson(pGameServer, g_Config.m_SvLives, svmap);
 	m_CWave.ReadFile(g_Config.m_SvWaveFile);
 	//mem_zero(m_Zombie, sizeof(m_Zombie));
 }
