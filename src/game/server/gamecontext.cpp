@@ -849,24 +849,14 @@ void CGameContext::OnZombieKill(int VictimID, int KillerID)
 {
     if(VictimID >= 4) {
 
-        //Send fucking netmessage
-        CNetMsg_Sv_ClientDrop Msg;
-        Msg.m_ClientID = VictimID;
-        Msg.m_pReason = "";
-        Msg.m_Silent = true;
 
-        Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
-        if(m_apPlayers[VictimID] && m_apPlayers[VictimID]->GetCharacter())
-            m_apPlayers[VictimID]->DeleteCharacter();
+        if(DisconnectZombie(VictimID))
+        {
+            m_pController->GetWaveHandler()->OnZombieKill();
+            //Stats
+            m_pController->GetTopFive()->IncreaseKills();
+        }
 
-        if(m_apPlayers[VictimID])
-            delete m_apPlayers[VictimID];
-
-        m_apPlayers[VictimID] = 0;
-        m_pController->GetWaveHandler()->OnZombieKill();
-
-        //Stats
-        m_pController->GetTopFive()->IncreaseKills();
     }
     else if(KillerID >= 4)//Died by Zombie, not himself!
     {
@@ -885,6 +875,29 @@ void CGameContext::OnZombieKill(int VictimID, int KillerID)
 		if(m_apPlayers[i] && m_apPlayers[i]->GetSpectatorID() == ClientID)
 			m_apPlayers[i]->SetSpectatorID(SPEC_FREEVIEW, -1);
 	}*/
+}
+
+bool CGameContext::DisconnectZombie(int ClientID)
+{
+    //Send fucking netmessage
+    if(!m_apPlayers[ClientID] || ClientID < 4)
+        return false;
+    CNetMsg_Sv_ClientDrop Msg;
+    Msg.m_ClientID = ClientID;
+    Msg.m_pReason = "";
+    Msg.m_Silent = true;
+
+    Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
+    if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetCharacter())
+    {
+        m_apPlayers[ClientID]->DeleteCharacter();
+    }
+
+    if(m_apPlayers[ClientID])
+        delete m_apPlayers[ClientID];
+
+    m_apPlayers[ClientID] = 0;
+    return true;
 }
 
 void CGameContext::OnClientConnected(int ClientID, bool Dummy)

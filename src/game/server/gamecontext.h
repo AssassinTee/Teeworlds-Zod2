@@ -183,6 +183,7 @@ public:
 		//Zomb2
 	void OnZombie(int ClientID, int Zomb);
     void OnZombieKill(int ClientID, int KillerID);
+    bool DisconnectZombie(int ClientID);
 };
 
 inline int64 CmaskAll() { return -1; }
