@@ -761,9 +761,9 @@ void CGameContext::OnClientEnter(int ClientID)
 		ClientInfoMsg.m_ClientID = i;
 		ClientInfoMsg.m_Local = 0;
 		ClientInfoMsg.m_Team = m_apPlayers[i]->GetTeam();
-		ClientInfoMsg.m_pName = Server()->ClientName(i);
-		ClientInfoMsg.m_pClan = Server()->ClientClan(i);
-		ClientInfoMsg.m_Country = Server()->ClientCountry(i);
+		ClientInfoMsg.m_pName = (i >= 4 ? m_apPlayers[i]->GetZombieName() : Server()->ClientName(i));
+		ClientInfoMsg.m_pClan = (i >= 4 ? "Zombie" : Server()->ClientClan(i));
+		ClientInfoMsg.m_Country = (i >= 4 ? 0 : Server()->ClientCountry(i));
 		ClientInfoMsg.m_Silent = false;
 		for(int p = 0; p < 6; p++)
 		{
