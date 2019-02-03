@@ -616,7 +616,7 @@ int64 time_freq()
 #if defined(CONF_FAMILY_UNIX)
 	return 1000000;
 #elif defined(CONF_FAMILY_WINDOWS)
-	int64 t;
+	int64 t = 0;
 	QueryPerformanceFrequency((PLARGE_INTEGER)&t);
 	return t;
 #else
@@ -923,7 +923,7 @@ static int priv_net_close_all_sockets(NETSOCKET sock)
 
 static int priv_net_create_socket(int domain, int type, struct sockaddr *addr, int sockaddrlen, int use_random_port)
 {
-	int sock, e;
+	int sock;
 
 	/* create socket */
 	sock = socket(domain, type, 0);
@@ -963,7 +963,7 @@ static int priv_net_create_socket(int domain, int type, struct sockaddr *addr, i
 				((struct sockaddr_in6 *)(addr))->sin6_port = port;
 		}
 
-		e = bind(sock, addr, sockaddrlen);
+		int e = bind(sock, addr, sockaddrlen);
 		if(e == 0)
 			break;
 		else
@@ -992,7 +992,7 @@ static int priv_net_create_socket(int domain, int type, struct sockaddr *addr, i
 
 NETSOCKET net_udp_create(NETADDR bindaddr, int use_random_port)
 {
-	NETSOCKET sock = invalid_socket;
+	NETSOCKET sock;
 	NETADDR tmpbindaddr = bindaddr;
 	int broadcast = 1;
 	int recvsize = 65536;
@@ -1122,7 +1122,7 @@ int net_udp_recv(NETSOCKET sock, NETADDR *addr, void *data, int maxsize)
 	socklen_t fromlen;// = sizeof(sockaddrbuf);
 	int bytes = 0;
 
-	if(bytes == 0 && sock.ipv4sock >= 0)
+	if(sock.ipv4sock >= 0)//bytes is always 0
 	{
 		fromlen = sizeof(struct sockaddr_in);
 		bytes = recvfrom(sock.ipv4sock, (char*)data, maxsize, 0, (struct sockaddr *)&sockaddrbuf, &fromlen);
@@ -1153,7 +1153,7 @@ int net_udp_close(NETSOCKET sock)
 
 NETSOCKET net_tcp_create(NETADDR bindaddr)
 {
-	NETSOCKET sock = invalid_socket;
+	NETSOCKET sock;// = invalid_socket;
 	NETADDR tmpbindaddr = bindaddr;
 
 	if(bindaddr.type&NETTYPE_IPV4)
@@ -1595,10 +1595,9 @@ void swap_endian(void *data, unsigned elem_size, unsigned num)
 	while(num)
 	{
 		unsigned n = elem_size>>1;
-		char tmp;
 		while(n)
 		{
-			tmp = *src;
+			char tmp = *src;
 			*src = *dst;
 			*dst = tmp;
 
@@ -1982,13 +1981,10 @@ float str_tofloat(const char *str) { return atof(str); }
 
 char *str_utf8_skip_whitespaces(char *str)
 {
-	char *str_old;
-	int code;
-
 	while(*str)
 	{
-		str_old = str;
-		code = str_utf8_decode((const char **)&str);
+		char* str_old = str;
+		int code = str_utf8_decode((const char **)&str);
 
 		// check if unicode is not empty
 		if(code > 0x20 && code != 0xA0 && code != 0x034F && (code < 0x2000 || code > 0x200F) && (code < 0x2028 || code > 0x202F) &&
