@@ -992,7 +992,7 @@ static int priv_net_create_socket(int domain, int type, struct sockaddr *addr, i
 
 NETSOCKET net_udp_create(NETADDR bindaddr, int use_random_port)
 {
-	NETSOCKET sock;
+	NETSOCKET sock = invalid_socket;
 	NETADDR tmpbindaddr = bindaddr;
 	int broadcast = 1;
 	int recvsize = 65536;
@@ -1000,12 +1000,12 @@ NETSOCKET net_udp_create(NETADDR bindaddr, int use_random_port)
 	if(bindaddr.type&NETTYPE_IPV4)
 	{
 		struct sockaddr_in addr;
-		int socket = -1;
+		//int socket = -1;
 
 		/* bind, we should check for error */
 		tmpbindaddr.type = NETTYPE_IPV4;
 		netaddr_to_sockaddr_in(&tmpbindaddr, &addr);
-		socket = priv_net_create_socket(AF_INET, SOCK_DGRAM, (struct sockaddr *)&addr, sizeof(addr), use_random_port);
+		int socket = priv_net_create_socket(AF_INET, SOCK_DGRAM, (struct sockaddr *)&addr, sizeof(addr), use_random_port);
 		if(socket >= 0)
 		{
 			sock.type |= NETTYPE_IPV4;
@@ -1022,12 +1022,12 @@ NETSOCKET net_udp_create(NETADDR bindaddr, int use_random_port)
 	if(bindaddr.type&NETTYPE_IPV6)
 	{
 		struct sockaddr_in6 addr;
-		int socket = -1;
+		//int socket = -1;
 
 		/* bind, we should check for error */
 		tmpbindaddr.type = NETTYPE_IPV6;
 		netaddr_to_sockaddr_in6(&tmpbindaddr, &addr);
-		socket = priv_net_create_socket(AF_INET6, SOCK_DGRAM, (struct sockaddr *)&addr, sizeof(addr), use_random_port);
+		int socket = priv_net_create_socket(AF_INET6, SOCK_DGRAM, (struct sockaddr *)&addr, sizeof(addr), use_random_port);
 		if(socket >= 0)
 		{
 			sock.type |= NETTYPE_IPV6;
@@ -1153,18 +1153,18 @@ int net_udp_close(NETSOCKET sock)
 
 NETSOCKET net_tcp_create(NETADDR bindaddr)
 {
-	NETSOCKET sock;// = invalid_socket;
+	NETSOCKET sock = invalid_socket;
 	NETADDR tmpbindaddr = bindaddr;
 
 	if(bindaddr.type&NETTYPE_IPV4)
 	{
 		struct sockaddr_in addr;
-		int socket = -1;
+        //int socket = -1;
 
 		/* bind, we should check for error */
 		tmpbindaddr.type = NETTYPE_IPV4;
 		netaddr_to_sockaddr_in(&tmpbindaddr, &addr);
-		socket = priv_net_create_socket(AF_INET, SOCK_STREAM, (struct sockaddr *)&addr, sizeof(addr), 0);
+		int socket = priv_net_create_socket(AF_INET, SOCK_STREAM, (struct sockaddr *)&addr, sizeof(addr), 0);
 		if(socket >= 0)
 		{
 			sock.type |= NETTYPE_IPV4;
@@ -1175,12 +1175,12 @@ NETSOCKET net_tcp_create(NETADDR bindaddr)
 	if(bindaddr.type&NETTYPE_IPV6)
 	{
 		struct sockaddr_in6 addr;
-		int socket = -1;
+		//int socket = -1;
 
 		/* bind, we should check for error */
 		tmpbindaddr.type = NETTYPE_IPV6;
 		netaddr_to_sockaddr_in6(&tmpbindaddr, &addr);
-		socket = priv_net_create_socket(AF_INET6, SOCK_STREAM, (struct sockaddr *)&addr, sizeof(addr), 0);
+		int socket = priv_net_create_socket(AF_INET6, SOCK_STREAM, (struct sockaddr *)&addr, sizeof(addr), 0);
 		if(socket >= 0)
 		{
 			sock.type |= NETTYPE_IPV6;
