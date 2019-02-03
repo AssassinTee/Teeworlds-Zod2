@@ -83,10 +83,6 @@ void CTopFiveJson::ReadJsonFile()
             m_Entries.push_back(entry);
         }
     }
-    else
-    {
-        //SaveJsonFile();
-    }
 }
 
 void CTopFiveJson::SaveJsonFile()
