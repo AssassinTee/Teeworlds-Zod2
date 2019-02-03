@@ -87,7 +87,8 @@ void dbg_msg(const char *sys, const char *fmt, ...)
 	va_list args;
 	char str[1024*4];
 	char *msg;
-	int i, len;
+	int i;
+	size_t len;
 
 	str_format(str, sizeof(str), "[%08x][%s]: ", (int)time(0), sys);
 	len = strlen(str);
@@ -480,7 +481,11 @@ void thread_yield()
 void thread_sleep(int milliseconds)
 {
 #if defined(CONF_FAMILY_UNIX)
-	usleep(milliseconds*1000);
+	//usleep(milliseconds*1000);
+	struct timespec tim, tim2;
+	tim.tv_sec = 0;
+	tim.tv_nsec = milliseconds*1000000;
+	nanosleep(&tim, &tim2);
 #elif defined(CONF_FAMILY_WINDOWS)
 	Sleep(milliseconds);
 #else
@@ -1441,16 +1446,16 @@ int fs_storage_path(const char *appname, char *path, int max)
 	char *home = getenv("HOME");
 	if(!home)
 		return -1;
-	
+
 #if defined(CONF_PLATFORM_MACOSX)
 	snprintf(path, max, "%s/Library/Application Support/%s", home, appname);
 	return 0;
 #endif
 
-	int i;
+	size_t i;
 	char *xdgdatahome = getenv("XDG_DATA_HOME");
 	char xdgpath[max];
-	
+
 	/* old folder location */
 	snprintf(path, max, "%s/.%s", home, appname);
 	for(i = strlen(home)+2; path[i]; i++)
@@ -1469,7 +1474,7 @@ int fs_storage_path(const char *appname, char *path, int max)
 		for(i = strlen(xdgdatahome)+1; xdgpath[i]; i++)
 			xdgpath[i] = tolower(xdgpath[i]);
 	}
-	
+
 	/* check for old location / backward compatibility */
 	if(fs_is_dir(path))
 	{
@@ -1477,7 +1482,7 @@ int fs_storage_path(const char *appname, char *path, int max)
 		/* for backward compatibility */
 		return 0;
 	}
-	
+
 	snprintf(path, max, "%s", xdgpath);
 
 	return 0;
@@ -1676,8 +1681,9 @@ void str_append(char *dst, const char *src, int dst_size)
 
 void str_copy(char *dst, const char *src, int dst_size)
 {
-	strncpy(dst, src, dst_size);
-	dst[dst_size-1] = 0; /* assure null termination */
+	//strncpy(dst, src, dst_size);
+	//dst[dst_size-1] = 0; /* assure null termination */
+	snprintf(dst, dst_size, "%s", src);
 }
 
 int str_length(const char *str)
