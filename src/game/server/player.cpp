@@ -36,7 +36,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, int Zombie
 	m_DeadSpecMode = false;
 	m_Spawning = 0;
     m_ZombieActiveWeaponType = 0;//WEAPON_HAMMER
-    m_Latency = 0;
+    m_Latency.m_Avg = 0;
 }
 
 CPlayer::~CPlayer()
