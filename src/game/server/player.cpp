@@ -13,7 +13,7 @@ MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS)
 
 IServer *CPlayer::Server() const { return m_pGameServer->Server(); }
 
-CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, int Zombietype)
+CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, int Zombietype) : m_aSubZomb{NONE}
 {
 	m_pGameServer = pGameServer;
 	m_RespawnTick = Server()->Tick();
@@ -35,11 +35,6 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, int Zombie
 	m_RespawnDisabled = GameServer()->m_pController->GetStartRespawnState();
 	m_DeadSpecMode = false;
 	m_Spawning = 0;
-	if(m_Zombie == ZEATER)
-    {
-        for(int i = 0; i < 3; ++i)
-            m_aSubZomb[i] = NONE;
-    }
     m_ZombieActiveWeaponType = 0;//WEAPON_HAMMER
 }
 
