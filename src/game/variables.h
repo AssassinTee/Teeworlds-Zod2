@@ -130,11 +130,12 @@ MACRO_CONFIG_INT(SvVoteKickBantime, sv_vote_kick_bantime, 5, 0, 1440, CFGFLAG_SA
 
 //Zomb2
 MACRO_CONFIG_INT(SvZombWarmup, sv_zomb_warmup, 10, 0, 30, CFGFLAG_SERVER, "Number of seconds to do warmup before wave starts")
-MACRO_CONFIG_INT(SvLives, sv_lives, 10, 0, 0, CFGFLAG_SERVER, "Number of the human deaths until the round ends")
+MACRO_CONFIG_INT(SvLives, sv_lives, 10, 0, 1000, CFGFLAG_SERVER, "Number of the human deaths until the round ends")
 MACRO_CONFIG_INT(SvAllowSpecVote, sv_spec_vote, 0, 1, 1, CFGFLAG_SERVER, "Allow spec voting or not")
-MACRO_CONFIG_INT(SvMaxZombieSpawn, sv_max_zombie_spawn, 1, 100, 20, CFGFLAG_SERVER, "Number of the max spawn tries of all zombies per tick")
+MACRO_CONFIG_INT(SvMaxZombieSpawn, sv_max_zombie_spawn, 10, 1, 64, CFGFLAG_SERVER, "Maximum number of Zombies spawning per game tick")
+MACRO_CONFIG_INT(SvMaxZombieDespawn, sv_max_zombie_despawn, 1, 1, 64, CFGFLAG_SERVER, "Maximum number of Zombies despawning per game tick after round end")
 MACRO_CONFIG_STR(SvWaveFile, sv_wave_file, 64, "example_wave.json", CFGFLAG_SAVE|CFGFLAG_SERVER, "Json file that is loaded for waveconfig")
-MACRO_CONFIG_STR(SVTopFiveFile, sv_top_five_file, 64, "top5.json", CFGFLAG_SAVE|CFGFLAG_SERVER, "Json file for saving top5")
+//MACRO_CONFIG_STR(SvTopFiveFile, sv_top_five_file, 64, "top5.json", CFGFLAG_SAVE|CFGFLAG_SERVER, "Json file for saving top5")
 
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
