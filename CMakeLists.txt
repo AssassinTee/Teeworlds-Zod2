@@ -1382,12 +1382,12 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   gameworld.h
   player.cpp
   player.h
+  tools/skinreader.h
+  top5/topfivebase.h
+  top5/topfivejson.h
+  top5/topfivejson.cpp
   wave.cpp
   wave.h
-  top5/topfivejson.h
-  top5/topfivebase.h
-  top5/topfivejson.cpp
-  tools/skinreader.h
 )
 set(GAME_GENERATED_SERVER
   src/generated/server_data.cpp
