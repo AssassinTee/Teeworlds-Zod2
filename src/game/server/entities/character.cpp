@@ -969,7 +969,7 @@ void CCharacter::DoZombieAim(vec2 VictimPos, int VicCID, vec2 NearZombPos, int N
 				m_Core.m_Pos = VictimPos + vec2(0, 32);
 			else
 				m_Core.m_Pos = VictimPos - vec2(0, 32);
-			m_Core.m_Vel.y =- 0.1;
+			m_Core.m_Vel.y =- 0.1f;
 			m_Pos = m_Core.m_Pos;
 		}
 	}

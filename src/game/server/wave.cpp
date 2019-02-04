@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 
-CWave::CWave(CGameContext* pGameServer) : m_JsonZombieNames({"Zaby", "Zoomer", "Zooker", "Zamer", "Zunner", "Zaster", "Zotter", "Zenade", "Flombie", "Zinja", "Zele", "Zinvis", "Zeater"})
+CWave::CWave(CGameContext* pGameServer) : m_JsonZombieNames{"Zaby", "Zoomer", "Zooker", "Zamer", "Zunner", "Zaster", "Zotter", "Zenade", "Flombie", "Zinja", "Zele", "Zinvis", "Zeater"}
 {
     m_pGameServer = pGameServer;
     m_Endless = 0;
