@@ -228,11 +228,8 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	Msg.m_pMessage = pText;
 	Msg.m_TargetID = -1;
 
-
-	if(Mode == CHAT_ALL) {
+	if(Mode == CHAT_ALL)
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
-
-    }
 	else if(Mode == CHAT_TEAM)
 	{
 		// pack one for the recording only
@@ -431,7 +428,7 @@ void CGameContext::SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3
 }
 
 //
-void CGameContext::StartVote(int Type, const char *pDesc, const char *pCommand, const char *pReason)
+void CGameContext::StartVote(const char *pDesc, const char *pCommand, const char *pReason)
 {
 	// check if a vote is already running
 	if(m_VoteCloseTime)
@@ -454,7 +451,7 @@ void CGameContext::StartVote(int Type, const char *pDesc, const char *pCommand, 
 	str_copy(m_aVoteDescription, pDesc, sizeof(m_aVoteDescription));
 	str_copy(m_aVoteCommand, pCommand, sizeof(m_aVoteCommand));
 	str_copy(m_aVoteReason, pReason, sizeof(m_aVoteReason));
-	SendVoteSet(Type, -1);
+	SendVoteSet(m_VoteType, -1);
 	m_VoteUpdate = true;
 }
 
@@ -515,14 +512,14 @@ void CGameContext::SendVoteStatus(int ClientID, int Total, int Yes, int No)
 
 void CGameContext::AbortVoteOnDisconnect(int ClientID)
 {
-	if(m_VoteCloseTime && ClientID == m_VoteClientID && (!str_comp_num(m_aVoteCommand, "kick ", 5) ||
-		!str_comp_num(m_aVoteCommand, "set_team ", 9) || (!str_comp_num(m_aVoteCommand, "ban ", 4) && Server()->IsBanned(ClientID))))
+	if(m_VoteCloseTime && ClientID == m_VoteClientID && (str_startswith(m_aVoteCommand, "kick ") ||
+		str_startswith(m_aVoteCommand, "set_team ") || (str_startswith(m_aVoteCommand, "ban ") && Server()->IsBanned(ClientID))))
 		m_VoteCloseTime = -1;
 }
 
 void CGameContext::AbortVoteOnTeamChange(int ClientID)
 {
-	if(m_VoteCloseTime && ClientID == m_VoteClientID && !str_comp_num(m_aVoteCommand, "set_team ", 9))
+	if(m_VoteCloseTime && ClientID == m_VoteClientID && str_startswith(m_aVoteCommand, "set_team "))
 		m_VoteCloseTime = -1;
 }
 
@@ -746,7 +743,6 @@ void CGameContext::OnClientEnter(int ClientID)
 		NewClientInfoMsg.m_aSkinPartColors[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aSkinPartColors[p];
 	}
 
-
 	for(int i = 0; i < 64; ++i)
 	{
 		if(i == ClientID || !m_apPlayers[i] || (!Server()->ClientIngame(i) && !m_apPlayers[i]->IsDummy() && !m_apPlayers[i]->GetZomb()))
@@ -782,6 +778,7 @@ void CGameContext::OnClientEnter(int ClientID)
 	{
 		CNetMsg_De_ClientEnter Msg;
 		Msg.m_pName = NewClientInfoMsg.m_pName;
+		Msg.m_ClientID = ClientID;
 		Msg.m_Team = NewClientInfoMsg.m_Team;
 		Server()->SendPackMsg(&Msg, MSGFLAG_NOSEND, -1);
 	}
@@ -919,7 +916,7 @@ void CGameContext::OnClientConnected(int ClientID, bool Dummy)
 
 	// send active vote
 	if(m_VoteCloseTime)
-		SendVoteSet(VOTE_UNKNOWN, ClientID);
+		SendVoteSet(m_VoteType, ClientID);
 
 	// send motd
 	SendMotd(ClientID);
@@ -1059,8 +1056,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 				pPlayer->m_LastVoteTry = Now;
 			}
-
-			int Type = VOTE_UNKNOWN;
+			m_VoteType = VOTE_UNKNOWN;
 			char aDesc[VOTE_DESC_LENGTH] = {0};
 			char aCmd[VOTE_CMD_LENGTH] = {0};
 			const char *pReason = pMsg->m_Reason[0] ? pMsg->m_Reason : "No reason given";
@@ -1082,7 +1078,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 							ForceVote(VOTE_START_OP, aDesc, pReason);
 							return;
 						}
-						Type = VOTE_START_OP;
+						m_VoteType = VOTE_START_OP;
 						break;
 					}
 
@@ -1117,7 +1113,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					Server()->SetRconCID(IServer::RCON_CID_SERV);
 					return;
 				}
-				Type = VOTE_START_KICK;
+				m_VoteType = VOTE_START_KICK;
 				m_VoteClientID = KickID;
 			}
 			else if(str_comp_nocase(pMsg->m_Type, "spectate") == 0)
@@ -1139,14 +1135,14 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					ForceVote(VOTE_START_SPEC, aDesc, pReason);
 					return;
 				}
-				Type = VOTE_START_SPEC;
+				m_VoteType = VOTE_START_SPEC;
 				m_VoteClientID = SpectateID;
 			}
 
-			if(Type != VOTE_UNKNOWN)
+			if(m_VoteType != VOTE_UNKNOWN)
 			{
 				m_VoteCreator = ClientID;
-				StartVote(Type, aDesc, aCmd, pReason);
+				StartVote(aDesc, aCmd, pReason);
 				pPlayer->m_Vote = 1;
 				pPlayer->m_VotePos = m_VotePos = 1;
 				pPlayer->m_LastVoteCall = Now;
@@ -1686,19 +1682,6 @@ void CGameContext::OnInit()
 	m_Collision.Init(&m_Layers);
 
 	// select gametype
-	/*if(str_comp_nocase(g_Config.m_SvGametype, "mod") == 0)
-		m_pController = new CGameControllerMOD(this);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "ctf") == 0)
-		m_pController = new CGameControllerCTF(this);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "lms") == 0)
-		m_pController = new CGameControllerLMS(this);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "lts") == 0)
-		m_pController = new CGameControllerLTS(this);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "tdm") == 0)
-		m_pController = new CGameControllerTDM(this);
-	else
-		m_pController = new CGameControllerDM(this);*/
-
     m_pController = new CGameControllerZOD(this);
 
 	// create all entities from the game layer

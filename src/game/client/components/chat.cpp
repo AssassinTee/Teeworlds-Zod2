@@ -139,6 +139,11 @@ void CChat::ConShowChat(IConsole::IResult *pResult, void *pUserData)
 	((CChat *)pUserData)->m_Show = pResult->GetInteger(0) != 0;
 }
 
+void CChat::OnInit()
+{
+	m_Input.Init(Input());
+}
+
 void CChat::OnConsoleInit()
 {
 	Console()->Register("say", "r", CFGFLAG_CLIENT, ConSay, this, "Say in chat");
@@ -217,7 +222,7 @@ bool CChat::OnInput(IInput::CEvent Event)
 				for(m_PlaceholderLength = 0; *pCursor && *pCursor != ' '; ++pCursor)
 					++m_PlaceholderLength;
 
-				str_copy(m_aCompletionBuffer, m_Input.GetString()+m_PlaceholderOffset, min(static_cast<int>(sizeof(m_aCompletionBuffer)), m_PlaceholderLength+1));
+				str_truncate(m_aCompletionBuffer, sizeof(m_aCompletionBuffer), m_Input.GetString()+m_PlaceholderOffset, m_PlaceholderLength);
 			}
 
 			// find next possible name
@@ -265,7 +270,7 @@ bool CChat::OnInput(IInput::CEvent Event)
 				{
 					pCompletionString = m_pClient->m_aClients[Index].m_aName;
 					m_CompletionChosen = Index+SearchType*MAX_CLIENTS;
-					m_CompletionFav = m_CompletionChosen;
+					m_CompletionFav = m_CompletionChosen%MAX_CLIENTS;
 					break;
 				}
 			}
@@ -275,7 +280,7 @@ bool CChat::OnInput(IInput::CEvent Event)
 			{
 				char aBuf[256];
 				// add part before the name
-				str_copy(aBuf, m_Input.GetString(), min(static_cast<int>(sizeof(aBuf)), m_PlaceholderOffset+1));
+				str_truncate(aBuf, sizeof(aBuf), m_Input.GetString(), m_PlaceholderOffset);
 
 				// add the name
 				str_append(aBuf, pCompletionString, sizeof(aBuf));
@@ -376,6 +381,10 @@ void CChat::AddLine(int ClientID, int Mode, const char *pLine, int TargetID)
 		m_pClient->m_aClients[ClientID].m_ChatIgnore ||
 		g_Config.m_ClFilterchat == 2 ||
 		(m_pClient->m_LocalClientID != ClientID && g_Config.m_ClFilterchat == 1 && !m_pClient->m_aClients[ClientID].m_Friend))))
+		return;
+	if(Mode == CHAT_WHISPER && (TargetID == -1 || !m_pClient->m_aClients[TargetID].m_Active || // unknown client
+		m_pClient->m_aClients[TargetID].m_ChatIgnore ||	g_Config.m_ClFilterchat == 2 ||
+		(m_pClient->m_LocalClientID != TargetID && g_Config.m_ClFilterchat == 1 && !m_pClient->m_aClients[TargetID].m_Friend)))
 		return;
 
 	// trim right and set maximum length to 128 utf8-characters
@@ -549,7 +558,9 @@ void CChat::OnRender()
 	const CGameClient::CClientData& LocalClient = m_pClient->m_aClients[LocalCID];
 	const int LocalTteam = LocalClient.m_Team;
 
-	if(m_Mode != CHAT_NONE)
+	if(m_Mode == CHAT_WHISPER && !m_pClient->m_aClients[m_WhisperTarget].m_Active)
+		m_Mode = CHAT_NONE;
+	else if(m_Mode != CHAT_NONE)
 	{
 		// calculate category text size
 		// TODO: rework TextRender. Writing the same code twice to calculate a simple thing as width is ridiculus
@@ -587,9 +598,9 @@ void CChat::OnRender()
 		}
 
 		// draw a background box
-		const vec4 CRCWhite(1, 1, 1, 0.25);
-		const vec4 CRCTeam(0.4, 1, 0.4, 0.4);
-		const vec4 CRCWhisper(0, 0.5, 1, 0.5);
+		const vec4 CRCWhite(1.0f, 1.0f, 1.0f, 0.25f);
+		const vec4 CRCTeam(0.4f, 1.0f, 0.4f, 0.4f);
+		const vec4 CRCWhisper(0.0f, 0.5f, 1.0f, 0.5f);
 
 		vec4 CatRectColor = CRCWhite;
 		if(m_Mode == CHAT_TEAM)
@@ -909,9 +920,10 @@ void CChat::OnRender()
 			if(Line.m_Mode == CHAT_WHISPER && Line.m_ClientID == m_pClient->m_LocalClientID && Line.m_TargetID >= 0)
 				NameCID = Line.m_TargetID;
 
+			vec4 IdTextColor = vec4(0.1f*Blend, 0.1f*Blend, 0.1f*Blend, 1.0f*Blend);
 			vec4 BgIdColor = TextColor;
-			BgIdColor.a = 0.5f;
-			RenderTools()->DrawClientID(TextRender(), &Cursor, NameCID, BgIdColor);
+			BgIdColor.a = 0.5f*Blend;
+			RenderTools()->DrawClientID(TextRender(), &Cursor, NameCID, BgIdColor, IdTextColor);
 			str_format(aBuf, sizeof(aBuf), "%s: ", Line.m_aName);
 			TextRender()->TextShadowed(&Cursor, aBuf, -1, ShadowOffset, ShadowColor, TextColor);
 		}

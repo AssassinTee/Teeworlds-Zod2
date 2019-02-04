@@ -42,7 +42,13 @@ public:
 		bool SortComparePing(int Index1, int Index2) const;
 		bool SortCompareGametype(int Index1, int Index2) const;
 		bool SortCompareNumPlayers(int Index1, int Index2) const;
+<<<<<<< HEAD
 		bool SortCompareNumClients(int Index1, int Index2) const;
+=======
+		bool SortCompareNumRealPlayers(int Index1, int Index2) const;
+		bool SortCompareNumClients(int Index1, int Index2) const;
+		bool SortCompareNumRealClients(int Index1, int Index2) const;
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	};
 
 	//

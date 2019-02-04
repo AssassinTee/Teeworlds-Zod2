@@ -84,7 +84,12 @@ protected:
 			REASON_LENGTH=64,
 		};
 		int m_Expires;
+<<<<<<< HEAD
 		char m_aReason[REASON_LENGTH];
+=======
+		int m_LastInfoQuery;
+		char m_aReason[REASON_LENGTH];		
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	};
 
 	template<class T> struct CBan
@@ -147,7 +152,11 @@ protected:
 	typedef CBan<NETADDR> CBanAddr;
 	typedef CBan<CNetRange> CBanRange;
 	
+<<<<<<< HEAD
 	template<class T> void MakeBanInfo(const CBan<T> *pBan, char *pBuf, unsigned BuffSize, int Type) const;
+=======
+	template<class T> void MakeBanInfo(CBan<T> *pBan, char *pBuf, unsigned BuffSize, int Type, int *pLastInfoQuery=0);
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	template<class T> int Ban(T *pBanPool, const typename T::CDataType *pData, int Seconds, const char *pReason);
 	template<class T> int Unban(T *pBanPool, const typename T::CDataType *pData);
 
@@ -179,7 +188,11 @@ public:
 	int UnbanByRange(const CNetRange *pRange);
 	int UnbanByIndex(int Index);
 	void UnbanAll();
+<<<<<<< HEAD
 	bool IsBanned(const NETADDR *pAddr, char *pBuf, unsigned BufferSize) const;
+=======
+	bool IsBanned(const NETADDR *pAddr, char *pBuf, unsigned BufferSize, int *pLastInfoQuery);
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 	static void ConBan(class IConsole::IResult *pResult, void *pUser);
 	static void ConBanRange(class IConsole::IResult *pResult, void *pUser);

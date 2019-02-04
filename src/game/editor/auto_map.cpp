@@ -186,6 +186,7 @@ void CTilesetMapper::Proceed(CLayerTiles *pLayer, int ConfigID)
 	m_pEditor->m_Map.m_Modified = true;
 }
 
+<<<<<<< HEAD
 int CompareRules(const void *a, const void *b)
 {
 	CDoodadsMapper::CRule *ra = (CDoodadsMapper::CRule*)a;
@@ -210,6 +211,8 @@ int CompareRules(const void *a, const void *b)
 	return 0;
 }
 
+=======
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 void CDoodadsMapper::Load(const json_value &rElement)
 {
 	for(unsigned i = 0; i < rElement.u.array.length; ++i)
@@ -307,7 +310,13 @@ void CDoodadsMapper::Load(const json_value &rElement)
 
 	// sort
 	for(int i = 0; i < m_aRuleSets.size(); i++)
+<<<<<<< HEAD
 		qsort(m_aRuleSets[i].m_aRules.base_ptr(), m_aRuleSets[i].m_aRules.size(), sizeof(m_aRuleSets[i].m_aRules[0]), CompareRules);
+=======
+	{
+		std::stable_sort(&m_aRuleSets[i].m_aRules[0], &m_aRuleSets[i].m_aRules[m_aRuleSets[i].m_aRules.size()]);
+	}
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 }
 
 const char* CDoodadsMapper::GetRuleSetName(int Index) const

@@ -70,6 +70,12 @@ enum
 	NETMSG_PING,
 	NETMSG_PING_REPLY,
 	NETMSG_ERROR,
+<<<<<<< HEAD
+=======
+
+	NETMSG_MAPLIST_ENTRY_ADD,// todo 0.8: move up
+	NETMSG_MAPLIST_ENTRY_REM,
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 };
 
 // this should be revised

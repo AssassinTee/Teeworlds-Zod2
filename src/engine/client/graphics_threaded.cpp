@@ -6,7 +6,12 @@
 #include <base/tl/threading.h>
 
 #include <base/system.h>
+<<<<<<< HEAD
 #include <engine/external/pnglite/pnglite.h>
+=======
+
+#include <pnglite.h>
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
@@ -522,6 +527,10 @@ void CGraphics_Threaded::QuadsBegin()
 	QuadsSetSubset(0,0,1,1,-1);
 	QuadsSetRotation(0);
 	SetColor(1,1,1,1);
+<<<<<<< HEAD
+=======
+	m_TextureArrayIndex = m_pBackend->GetTextureArraySize() > 1 ? -1 : 0;
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 }
 
 void CGraphics_Threaded::QuadsEnd()
@@ -572,17 +581,46 @@ void CGraphics_Threaded::SetColor4(vec4 TopLeft, vec4 TopRight, vec4 BottomLeft,
 	SetColorVertex(Array, 4);
 }
 
+<<<<<<< HEAD
+=======
+void CGraphics_Threaded::TilesetFallbackSystem(int TextureIndex)
+{
+	int NewTextureArrayIndex = TextureIndex / (256 / m_pBackend->GetTextureArraySize());
+	if(m_TextureArrayIndex == -1)
+		m_TextureArrayIndex = NewTextureArrayIndex;
+	else if(m_TextureArrayIndex != NewTextureArrayIndex)
+	{
+		// have to switch the texture index
+		FlushVertices();
+		m_TextureArrayIndex = NewTextureArrayIndex;
+	}
+}
+
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 void CGraphics_Threaded::QuadsSetSubset(float TlU, float TlV, float BrU, float BrV, int TextureIndex)
 {
 	dbg_assert(m_Drawing == DRAWING_QUADS, "called Graphics()->QuadsSetSubset without begin");
 
+<<<<<<< HEAD
+=======
+	// tileset fallback system
+	if(m_pBackend->GetTextureArraySize() > 1 && TextureIndex >= 0)
+		TilesetFallbackSystem(TextureIndex);
+
+	m_State.m_TextureArrayIndex = m_TextureArrayIndex;
+
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	m_aTexture[0].u = TlU;	m_aTexture[1].u = BrU;
 	m_aTexture[0].v = TlV;	m_aTexture[1].v = TlV;
 
 	m_aTexture[3].u = TlU;	m_aTexture[2].u = BrU;
 	m_aTexture[3].v = BrV;	m_aTexture[2].v = BrV;
 
+<<<<<<< HEAD
 	m_aTexture[0].i = m_aTexture[1].i = m_aTexture[2].i = m_aTexture[3].i = (0.5f + TextureIndex) / 256.0f;
+=======
+	m_aTexture[0].i = m_aTexture[1].i = m_aTexture[2].i = m_aTexture[3].i = (0.5f + TextureIndex) / (256.0f/m_pBackend->GetTextureArraySize());
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	m_State.m_Dimension = (TextureIndex < 0) ? 2 : 3;
 }
 
@@ -590,12 +628,25 @@ void CGraphics_Threaded::QuadsSetSubsetFree(
 	float x0, float y0, float x1, float y1,
 	float x2, float y2, float x3, float y3, int TextureIndex)
 {
+<<<<<<< HEAD
+=======
+	// tileset fallback system
+	if(m_pBackend->GetTextureArraySize() > 1 && TextureIndex >= 0)
+		TilesetFallbackSystem(TextureIndex);
+	
+	m_State.m_TextureArrayIndex = m_TextureArrayIndex;
+
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	m_aTexture[0].u = x0; m_aTexture[0].v = y0;
 	m_aTexture[1].u = x1; m_aTexture[1].v = y1;
 	m_aTexture[2].u = x2; m_aTexture[2].v = y2;
 	m_aTexture[3].u = x3; m_aTexture[3].v = y3;
 
+<<<<<<< HEAD
 	m_aTexture[0].i = m_aTexture[1].i = m_aTexture[2].i = m_aTexture[3].i = (0.5f + TextureIndex) / 256.0f;
+=======
+	m_aTexture[0].i = m_aTexture[1].i = m_aTexture[2].i = m_aTexture[3].i = (0.5f + TextureIndex) / (256.0f/m_pBackend->GetTextureArraySize());
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	m_State.m_Dimension = (TextureIndex < 0) ? 2 : 3;
 }
 

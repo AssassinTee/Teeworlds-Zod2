@@ -5,6 +5,6 @@
 #include <generated/nethash.cpp>
 #define GAME_VERSION "0.7.2"
 #define GAME_NETVERSION "0.7 802f1be60a05665f"
-#define CLIENT_VERSION 0x0701
-static const char GAME_RELEASE_VERSION[8] = "0.7.1";//{'0', '.', '7', '.', '1', 0};
+#define CLIENT_VERSION 0x0703
+static const char GAME_RELEASE_VERSION[8] = "0.7.2";
 #endif

@@ -84,6 +84,7 @@ void CHud::RenderPauseTimer()
 				str_format(aBuf, sizeof(aBuf), Localize("%d players not ready"), m_pClient->m_Snap.m_NotReadyCount);
 			else
 				return;
+			RenderReadyUpNotification();
 		}
 		else
 		{
@@ -291,7 +292,7 @@ void CHud::RenderScoreHud()
 					int ID = aPlayerInfo[t].m_ClientID;
 					char aName[64];
 					str_format(aName, sizeof(aName), "%s", g_Config.m_ClShowsocial ? m_pClient->m_aClients[ID].m_aName : "");
-					float w = TextRender()->TextWidth(0, 8.0f, aName, -1);
+					float w = TextRender()->TextWidth(0, 8.0f, aName, -1) + RenderTools()->GetClientIdRectSize(8.0f);
 
 					CTextCursor Cursor;
 					float x = min(Whole-w-1.0f, Whole-ScoreWidthMax-ImageSize-2*Split-PosSize);
@@ -344,9 +345,15 @@ void CHud::RenderWarmupTimer()
 		if(m_pClient->m_Snap.m_pGameData->m_GameStateEndTick == 0)
 		{
 			if(m_pClient->m_Snap.m_NotReadyCount == 1)
+			{
 				str_format(aBuf, sizeof(aBuf), Localize("%d player not ready"), m_pClient->m_Snap.m_NotReadyCount);
+				RenderReadyUpNotification();
+			}
 			else if(m_pClient->m_Snap.m_NotReadyCount > 1)
+			{
 				str_format(aBuf, sizeof(aBuf), Localize("%d players not ready"), m_pClient->m_Snap.m_NotReadyCount);
+				RenderReadyUpNotification();
+			}
 			else
 			{
 				str_format(aBuf, sizeof(aBuf), Localize("wait for more players"));
@@ -671,6 +678,19 @@ void CHud::RenderSpectatorNotification()
 		float FontSize = 16.0f;
 		float w = TextRender()->TextWidth(0, FontSize, pText, -1);
 		TextRender()->Text(0, 150 * Graphics()->ScreenAspect() + -w / 2, 30, FontSize, pText, -1);
+	}
+}
+
+void CHud::RenderReadyUpNotification()
+{
+	if(!(m_pClient->m_Snap.m_paPlayerInfos[m_pClient->m_LocalClientID]->m_PlayerFlags&PLAYERFLAG_READY))
+	{
+		char aKey[64], aText[128];
+		m_pClient->m_pBinds->GetKey("ready_change", aKey, sizeof(aKey));
+		str_format(aText, sizeof(aText), Localize("When ready, press <%s>"), aKey);
+		float FontSize = 16.0f;
+		float w = TextRender()->TextWidth(0, FontSize, aText, -1);
+		TextRender()->Text(0, 150 * Graphics()->ScreenAspect() + -w / 2, 30, FontSize, aText, -1);
 	}
 }
 

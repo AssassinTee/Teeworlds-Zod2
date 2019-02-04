@@ -45,7 +45,11 @@ public:
 	void RemoveFavorite(const CServerInfo *pEntry);
 
 	int AddFilter(const CServerFilterInfo *pFilterInfo) { return m_ServerBrowserFilter.AddFilter(pFilterInfo); };
+<<<<<<< HEAD
 	void SetFilter(int Index, const CServerFilterInfo *pFilterInfo) { m_ServerBrowserFilter.SetFilter(Index, pFilterInfo); }; 
+=======
+	void SetFilter(int Index, const CServerFilterInfo *pFilterInfo) { m_ServerBrowserFilter.SetFilter(Index, pFilterInfo); };
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	void GetFilter(int Index, CServerFilterInfo *pFilterInfo) { m_ServerBrowserFilter.GetFilter(Index, pFilterInfo); };
 	void RemoveFilter(int Index) { m_ServerBrowserFilter.RemoveFilter(Index); };
 

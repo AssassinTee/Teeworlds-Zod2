@@ -202,6 +202,7 @@ void CCollision::MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elas
 	*pInoutPos = Pos;
 	*pInoutVel = Vel;
 }
+<<<<<<< HEAD
 
 bool CCollision::CheckTiles(vec2 Pos, int Deepness)
 {
@@ -262,3 +263,5 @@ bool CCollision::IntersectTile(vec2 Pos0, vec2 Pos1)
 	}
 	return false;
 }
+=======
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32

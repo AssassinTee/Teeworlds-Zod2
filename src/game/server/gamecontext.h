@@ -92,7 +92,7 @@ public:
 	int m_LockTeams;
 
 	// voting
-	void StartVote(int Type, const char *pDesc, const char *pCommand, const char *pReason);
+	void StartVote(const char *pDesc, const char *pCommand, const char *pReason);
 	void EndVote(int Type, bool Force);
 	void ForceVote(int Type, const char *pDescription, const char *pReason);
 	void SendVoteSet(int Type, int ToClientID);
@@ -101,6 +101,7 @@ public:
 	void AbortVoteOnTeamChange(int ClientID);
 
 	int m_VoteCreator;
+	int m_VoteType;
 	int64 m_VoteCloseTime;
 	int64 m_VoteCancelTime;
 	bool m_VoteUpdate;
@@ -134,6 +135,7 @@ public:
 
 	// network
 	void SendChat(int ChatterClientID, int Mode, int To, const char *pText);
+
     //Zomb
 	void SendCommand(int ChatterClientID, const std::string& command);
 	void SendBroadcast(const char *pText, int ClientID);
@@ -187,7 +189,7 @@ public:
 };
 
 inline int64 CmaskAll() { return -1; }
-inline int64 CmaskOne(int ClientID) { return 1<<ClientID; }
+inline int64 CmaskOne(int ClientID) { return (int64)1<<ClientID; }
 inline int64 CmaskAllExceptOne(int ClientID) { return CmaskAll()^CmaskOne(ClientID); }
 inline bool CmaskIsSet(int64 Mask, int ClientID) { return (Mask&CmaskOne(ClientID)) != 0; }
 #endif

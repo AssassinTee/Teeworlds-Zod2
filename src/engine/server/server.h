@@ -4,7 +4,11 @@
 #define ENGINE_SERVER_SERVER_H
 
 #include <engine/server.h>
+<<<<<<< HEAD
 
+=======
+#include <engine/shared/memheap.h>
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 class CSnapIDPool
 {
@@ -76,8 +80,18 @@ public:
 		AUTHED_ADMIN,
 
 		MAX_RCONCMD_SEND=16,
+<<<<<<< HEAD
 	};
 
+=======
+		MAX_MAPLISTENTRY_SEND = 32,
+		MIN_MAPLIST_CLIENTVERSION=0x0703,	// todo 0.8: remove me
+		MAX_RCONCMD_RATIO=8,
+	};
+
+	struct CMapListEntry;
+
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	class CClient
 	{
 	public:
@@ -127,6 +141,10 @@ public:
 		bool m_NoRconNote;
 		bool m_Quitting;
 		const IConsole::CCommandInfo *m_pRconCmdToSend;
+<<<<<<< HEAD
+=======
+		const CMapListEntry *m_pMapListEntryToSend;
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 		void Reset();
 	};
@@ -162,6 +180,28 @@ public:
 	int m_CurrentMapSize;
 	int m_MapChunksPerRequest;
 
+<<<<<<< HEAD
+=======
+	//maplist
+	struct CMapListEntry
+	{
+		CMapListEntry *m_pPrev;
+		CMapListEntry *m_pNext;
+		char m_aName[IConsole::TEMPMAP_NAME_LENGTH];
+	};
+
+	struct CSubdirCallbackUserdata
+	{
+		CServer *m_pServer;
+		char m_aName[IConsole::TEMPMAP_NAME_LENGTH];
+	};
+
+	CHeap *m_pMapListHeap;
+	CMapListEntry *m_pLastMapEntry;
+	CMapListEntry *m_pFirstMapEntry;
+	int m_NumMapEntries;
+
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	int m_RconPasswordSet;
 	int m_GeneratedRconPassword;
 
@@ -189,7 +229,11 @@ public:
 
 	void SetRconCID(int ClientID);
 	bool IsAuthed(int ClientID) const;
+<<<<<<< HEAD
 	bool IsBanned(int ClientID) const;
+=======
+	bool IsBanned(int ClientID);
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	int GetClientInfo(int ClientID, CClientInfo *pInfo) const;
 	void GetClientAddr(int ClientID, char *pAddrStr, int Size) const;
 	const char *ClientName(int ClientID) const;
@@ -213,6 +257,12 @@ public:
 	void SendRconCmdAdd(const IConsole::CCommandInfo *pCommandInfo, int ClientID);
 	void SendRconCmdRem(const IConsole::CCommandInfo *pCommandInfo, int ClientID);
 	void UpdateClientRconCommands();
+<<<<<<< HEAD
+=======
+	void SendMapListEntryAdd(const CMapListEntry *pMapListEntry, int ClientID);
+	void SendMapListEntryRem(const CMapListEntry *pMapListEntry, int ClientID);
+	void UpdateClientMapListEntries();
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 	void ProcessClientPacket(CNetChunk *pPacket);
 
@@ -227,6 +277,11 @@ public:
 	void InitRegister(CNetServer *pNetServer, IEngineMasterServer *pMasterServer, IConsole *pConsole);
 	int Run();
 
+<<<<<<< HEAD
+=======
+	static int MapListEntryCallback(const char *pFilename, int IsDir, int DirType, void *pUser);
+
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	static void ConKick(IConsole::IResult *pResult, void *pUser);
 	static void ConStatus(IConsole::IResult *pResult, void *pUser);
 	static void ConShutdown(IConsole::IResult *pResult, void *pUser);

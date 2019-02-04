@@ -97,7 +97,6 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
         m_Aim.m_Explode = false;
 
     }
-
 	return true;
 }
 
@@ -552,8 +551,6 @@ void CCharacter::Tick()
         return;
     }
 
-
-
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true);
 
@@ -794,8 +791,6 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	// check for death
 	if(m_Health <= 0)
 	{
-
-
 		// set attacker's face to happy (taunt!)
 		if (From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From])
 		{
@@ -806,7 +801,6 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 				pChr->m_EmoteStop = Server()->Tick() + Server()->TickSpeed();
 			}
 		}
-
 		//zomb2 swapped with above, took me hours to find this bug, "DIE" removes players instance
         Die(From, Weapon);
 		return false;

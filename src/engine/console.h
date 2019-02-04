@@ -24,6 +24,11 @@ public:
 		TEMPCMD_HELP_LENGTH=96,
 		TEMPCMD_PARAMS_LENGTH=16,
 
+<<<<<<< HEAD
+=======
+		TEMPMAP_NAME_LENGTH = 32,
+
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		MAX_PRINT_CB=4,
 	};
 
@@ -67,12 +72,22 @@ public:
 	virtual const CCommandInfo *FirstCommandInfo(int AccessLevel, int Flagmask) const = 0;
 	virtual const CCommandInfo *GetCommandInfo(const char *pName, int FlagMask, bool Temp) = 0;
 	virtual void PossibleCommands(const char *pStr, int FlagMask, bool Temp, FPossibleCallback pfnCallback, void *pUser) = 0;
+<<<<<<< HEAD
+=======
+	virtual void PossibleMaps(const char *pStr, FPossibleCallback pfnCallback, void *pUser) = 0;
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	virtual void ParseArguments(int NumArgs, const char **ppArguments) = 0;
 
 	virtual void Register(const char *pName, const char *pParams, int Flags, FCommandCallback pfnFunc, void *pUser, const char *pHelp) = 0;
 	virtual void RegisterTemp(const char *pName, const char *pParams, int Flags, const char *pHelp) = 0;
 	virtual void DeregisterTemp(const char *pName) = 0;
 	virtual void DeregisterTempAll() = 0;
+<<<<<<< HEAD
+=======
+	virtual void RegisterTempMap(const char *pName) = 0;
+	virtual void DeregisterTempMap(const char *pName) = 0;
+	virtual void DeregisterTempMapAll() = 0;
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	virtual void Chain(const char *pName, FChainCommandCallback pfnChainFunc, void *pUser) = 0;
 	virtual void StoreCommands(bool Store) = 0;
 

@@ -8,7 +8,6 @@
 #include "player.h"
 #include "tools/skinreader.h"
 
-
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS)
 
 IServer *CPlayer::Server() const { return m_pGameServer->Server(); }
@@ -351,7 +350,6 @@ void CPlayer::Respawn()
         m_Spawning = true;
         return;
     }
-
 	if(m_RespawnDisabled && m_Team != TEAM_SPECTATORS)
 	{
 		// enable spectate mode for dead players

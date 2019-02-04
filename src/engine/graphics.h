@@ -70,6 +70,11 @@ public:
 		TEXLOAD_ARRAY_256 = 4,
 		TEXLOAD_MULTI_DIMENSION = 8,
 		TEXLOAD_LINEARMIPMAPS = 16,
+<<<<<<< HEAD
+=======
+
+		NUMTILES_DIMENSION = 16,			// number of tiles in each dimension within a texture
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	};
 
 	/* Constants: Wrap Modes */

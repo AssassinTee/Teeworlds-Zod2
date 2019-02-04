@@ -57,7 +57,7 @@ class IGameController
 	EGameState m_GameState;
 	int m_GameStateTimer;
 
-	virtual void DoWincheckMatch();
+	virtual bool DoWincheckMatch();		// returns true when the match is over
 	virtual void DoWincheckRound() {};
 	bool HasEnoughPlayers() const { return (IsTeamplay() && m_aTeamSize[TEAM_RED] > 0 && m_aTeamSize[TEAM_BLUE] > 0) || (!IsTeamplay() && m_aTeamSize[TEAM_RED] > 1); }
 	void ResetGame();
@@ -79,7 +79,6 @@ class IGameController
 
 	// map
 	char m_aMapWish[128];
-
 	void CycleMap();
 
 	// spawn
@@ -139,9 +138,6 @@ protected:
 	} m_GameInfo;
 
 	void UpdateGameInfo(int ClientID);
-
-    //Zomb2
-    //int m_NoCheatLife;
 
 public:
 	IGameController(class CGameContext *pGameServer);

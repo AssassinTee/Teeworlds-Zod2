@@ -503,10 +503,19 @@ public:
 	}
 
 
+<<<<<<< HEAD
 	virtual void Text(void *pFontSetV, float x, float y, float Size, const char *pText, int MaxWidth)
 	{
 		CTextCursor Cursor;
 		SetCursor(&Cursor, x, y, Size, TEXTFLAG_RENDER);
+=======
+	virtual void Text(void *pFontSetV, float x, float y, float Size, const char *pText, int MaxWidth, bool MultiLine)
+	{
+		CTextCursor Cursor;
+		SetCursor(&Cursor, x, y, Size, TEXTFLAG_RENDER);
+		if(!MultiLine)
+			Cursor.m_Flags |= TEXTFLAG_STOP_AT_END;
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		Cursor.m_LineWidth = MaxWidth;
 		TextEx(&Cursor, pText, -1);
 	}

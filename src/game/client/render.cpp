@@ -315,7 +315,7 @@ void CRenderTools::DrawUIRect(const CUIRect *r, vec4 Color, int Corners, float R
 	// TODO: FIX US
 	Graphics()->QuadsBegin();
 	Graphics()->SetColor(Color.r*Color.a, Color.g*Color.a, Color.b*Color.a, Color.a);
-	DrawRoundRectExt(r->x,r->y,r->w,r->h,Rounding*UI()->Scale(), Corners);
+	DrawRoundRectExt(r->x,r->y,r->w,r->h,Rounding, Corners);
 	Graphics()->QuadsEnd();
 }
 
@@ -324,7 +324,7 @@ void CRenderTools::DrawUIRect4(const CUIRect *r, vec4 ColorTopLeft, vec4 ColorTo
 	Graphics()->TextureClear();
 
 	Graphics()->QuadsBegin();
-	DrawRoundRectExt4(r->x,r->y,r->w,r->h,ColorTopLeft,ColorTopRight,ColorBottomLeft,ColorBottomRight,Rounding*UI()->Scale(), Corners);
+	DrawRoundRectExt4(r->x,r->y,r->w,r->h,ColorTopLeft,ColorTopRight,ColorBottomLeft,ColorBottomRight,Rounding, Corners);
 	Graphics()->QuadsEnd();
 }
 
@@ -443,6 +443,33 @@ void CRenderTools::RenderTee(CAnimState *pAnim, CTeeRenderInfo *pInfo, int Emote
 					Graphics()->QuadsDraw(&QuadItem, 1);
 				}
 				Graphics()->QuadsEnd();
+
+				// draw xmas hat
+				if(!OutLine && pInfo->m_HatTexture.IsValid())
+				{
+					Graphics()->TextureSet(pInfo->m_HatTexture);
+					Graphics()->QuadsBegin();
+					Graphics()->QuadsSetRotation(pAnim->GetBody()->m_Angle*pi * 2);
+					Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+					int Flag = Direction.x < 0.0f ? SPRITE_FLAG_FLIP_X : 0;
+					switch(pInfo->m_HatSpriteIndex)
+					{
+					case 0:
+						SelectSprite(SPRITE_TEE_HATS_TOP1, Flag, 0, 0);
+						break;
+					case 1:
+						SelectSprite(SPRITE_TEE_HATS_TOP2, Flag, 0, 0);
+						break;
+					case 2:
+						SelectSprite(SPRITE_TEE_HATS_SIDE1, Flag, 0, 0);
+						break;
+					case 3:
+						SelectSprite(SPRITE_TEE_HATS_SIDE2, Flag, 0, 0);
+					}
+					Item = BodyItem;
+					Graphics()->QuadsDraw(&Item, 1);
+					Graphics()->QuadsEnd();
+				}
 			}
 
 			// draw feet
@@ -621,8 +648,7 @@ void CRenderTools::DrawClientID(ITextRender* pTextRender, CTextCursor* pCursor, 
 	pCursor->m_X += (ID < 10 ? 0.04f: 0.0f) * FontSize;
 
 	// TODO: make a simple text one (no shadow)
-	pTextRender->TextShadowed(pCursor, aBuff, -1, vec2(0,0), vec4(0,0,0,0),
-							  vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	pTextRender->TextShadowed(pCursor, aBuff, -1, vec2(0,0), vec4(0,0,0,0), TextColor);
 
 	pCursor->m_X = PrevX + Rect.w + 0.2f * FontSize;
 }

@@ -4,6 +4,10 @@
 
 #include <base/system.h>
 #include <engine/shared/config.h>
+<<<<<<< HEAD
+=======
+#include <engine/console.h>
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 #include <engine/graphics.h>
 #include <engine/input.h>
 #include <engine/keys.h>
@@ -38,16 +42,37 @@ CInput::CInput()
 
 	m_InputCounter = 1;
 	m_InputGrabbed = 0;
+<<<<<<< HEAD
 
 	m_LastRelease = 0;
 	m_ReleaseDelta = -1;
+=======
+	m_pClipboardText = 0;
+
+	m_MouseDoubleClick = false;
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 	m_NumEvents = 0;
+}
+
+<<<<<<< HEAD
+void CInput::Init()
+{
+	m_pGraphics = Kernel()->RequestInterface<IEngineGraphics>();
+=======
+CInput::~CInput()
+{
+	if(m_pClipboardText)
+	{
+		SDL_free(m_pClipboardText);
+	}
 }
 
 void CInput::Init()
 {
 	m_pGraphics = Kernel()->RequestInterface<IEngineGraphics>();
+	m_pConsole = Kernel()->RequestInterface<IConsole>();
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	// FIXME: unicode handling: use SDL_StartTextInput/SDL_StopTextInput on inputs
 
 	MouseModeRelative();
@@ -83,6 +108,13 @@ void CInput::MouseModeRelative()
 	{
 		m_InputGrabbed = 1;
 		SDL_ShowCursor(SDL_DISABLE);
+<<<<<<< HEAD
+=======
+		if(SDL_SetHintWithPriority(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, g_Config.m_InpGrab ? "0" : "1", SDL_HINT_OVERRIDE) == SDL_FALSE)
+		{
+			m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "input", "unable to switch relative mouse mode");
+		}
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 		SDL_GetRelativeMouseState(NULL, NULL);
 	}
@@ -90,15 +122,39 @@ void CInput::MouseModeRelative()
 
 int CInput::MouseDoubleClick()
 {
+<<<<<<< HEAD
 	if(m_ReleaseDelta >= 0 && m_ReleaseDelta < (time_freq() >> 2))
 	{
 		m_LastRelease = 0;
 		m_ReleaseDelta = -1;
+=======
+	if(m_MouseDoubleClick)
+	{
+		m_MouseDoubleClick = false;
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		return 1;
 	}
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+const char *CInput::GetClipboardText()
+{
+	if(m_pClipboardText)
+	{
+		SDL_free(m_pClipboardText);
+	}
+	m_pClipboardText = SDL_GetClipboardText();
+	return m_pClipboardText;
+}
+
+void CInput::SetClipboardText(const char *pText)
+{
+	SDL_SetClipboardText(pText);
+}
+
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 void CInput::Clear()
 {
 	mem_zero(m_aInputState, sizeof(m_aInputState));
@@ -165,12 +221,15 @@ int CInput::Update()
 				case SDL_MOUSEBUTTONUP:
 					Action = IInput::FLAG_RELEASE;
 
+<<<<<<< HEAD
 					if(Event.button.button == 1) // ignore_convention
 					{
 						m_ReleaseDelta = time_get() - m_LastRelease;
 						m_LastRelease = time_get();
 					}
 
+=======
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 					// fall through
 				case SDL_MOUSEBUTTONDOWN:
 					if(Event.button.button == SDL_BUTTON_LEFT) Key = KEY_MOUSE_1; // ignore_convention
@@ -182,6 +241,11 @@ int CInput::Update()
 					if(Event.button.button == 7) Key = KEY_MOUSE_7; // ignore_convention
 					if(Event.button.button == 8) Key = KEY_MOUSE_8; // ignore_convention
 					if(Event.button.button == 9) Key = KEY_MOUSE_9; // ignore_convention
+<<<<<<< HEAD
+=======
+					if(Event.button.clicks%2 == 0 && Event.button.button == SDL_BUTTON_LEFT)
+						m_MouseDoubleClick = true;
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 					Scancode = Key;
 					break;
 

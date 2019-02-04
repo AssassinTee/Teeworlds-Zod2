@@ -8,7 +8,7 @@
 //////////////////////////////////////////////////
 // Event handler
 //////////////////////////////////////////////////
-CEventHandler::CEventHandler()//cpp ladies and gentleman
+CEventHandler::CEventHandler()
 {
 	m_pGameServer = 0;
 	Clear();

@@ -55,7 +55,6 @@ IGameController::IGameController(CGameContext *pGameServer) : m_CWave(pGameServe
     std::string svmap(g_Config.m_SvMap);
 	m_pTopFive = new CTopFiveJson(pGameServer, g_Config.m_SvLives, svmap);
 	m_CWave.ReadFile(g_Config.m_SvWaveFile);
-	//mem_zero(m_Zombie, sizeof(m_Zombie));
 }
 
 //activity
@@ -69,13 +68,15 @@ void IGameController::DoActivityCheck()
 		if(GameServer()->m_apPlayers[i] && !GameServer()->m_apPlayers[i]->IsDummy() && (GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS || g_Config.m_SvInactiveKick > 0) &&
 			!Server()->IsAuthed(i) && (GameServer()->m_apPlayers[i]->m_InactivityTickCounter > g_Config.m_SvInactiveKickTime*Server()->TickSpeed()*60))
 		{
-			if (GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS) {
-				Server()->Kick(i, "Kicked for inactivity");
+			if(GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+			{
+				if(g_Config.m_SvInactiveKickSpec)
+					Server()->Kick(i, "Kicked for inactivity");
 			}
-			else {
+			else
+			{
 				switch(g_Config.m_SvInactiveKick)
 				{
-				case 0:
 				case 1:
 					{
 						// move player to spectator
@@ -309,11 +310,13 @@ void IGameController::OnFlagReturn(CFlag *pFlag)
 bool IGameController::OnEntity(int Index, vec2 Pos)
 {
 	// don't add pickups in survival
-	if(m_GameFlags&GAMEFLAG_SURVIVAL && (Index < ENTITY_SPAWN || Index > ENTITY_SPAWN_BLUE))
+	if(m_GameFlags&GAMEFLAG_SURVIVAL)
 	{
-        return false;
+		if(Index < ENTITY_SPAWN || Index > ENTITY_SPAWN_BLUE)
+			return false;
 	}
 
+	int Type = -1;
 	switch(Index)
 	{
 	case ENTITY_SPAWN:
@@ -448,13 +451,16 @@ void IGameController::OnReset()
 }
 
 // game
-void IGameController::DoWincheckMatch()
+bool IGameController::DoWincheckMatch()
 {
 	if(IsTeamplay())
 	{
 		// check score win condition
 		if(m_aTeamscore[TEAM_RED] == 0)
+        {
             EndMatch();
+            return true;
+        }
 	}
 	else
 	{
@@ -480,11 +486,15 @@ void IGameController::DoWincheckMatch()
 			(m_GameInfo.m_TimeLimit > 0 && (Server()->Tick()-m_GameStartTick) >= m_GameInfo.m_TimeLimit*Server()->TickSpeed()*60))
 		{
 			if(TopscoreCount == 1)
+			{
 				EndMatch();
+				return true;
+			}
 			else
 				m_SuddenDeath = 1;
 		}
 	}
+	return false;
 }
 
 void IGameController::ResetGame()
@@ -547,19 +557,19 @@ void IGameController::SetGameStateWarmupGame(EGameState GameState, int Timer)
             m_GameStateTimer = TIMER_INFINITE;
 
             // enable respawning in survival when activating warmup
-				if(m_GameFlags&GAMEFLAG_SURVIVAL)
-				{
-					for(int i = 0; i < MAX_CLIENTS; ++i)
-						if(GameServer()->m_apPlayers[i])
-							GameServer()->m_apPlayers[i]->m_RespawnDisabled = false;
-				}
-			}
-			else if(Timer == 0)
-			{
-				// start new match
-				StartMatch();
-			}
-		}
+            if(m_GameFlags&GAMEFLAG_SURVIVAL)
+            {
+                for(int i = 0; i < MAX_CLIENTS; ++i)
+                    if(GameServer()->m_apPlayers[i])
+                        GameServer()->m_apPlayers[i]->m_RespawnDisabled = false;
+            }
+        }
+        else if(Timer == 0)
+        {
+            // start new match
+            StartMatch();
+        }
+    }
 }
 
 void IGameController::SetGameStateWarmupUser(EGameState GameState, int Timer)
@@ -678,6 +688,7 @@ void IGameController::StartMatch()
 	ResetGame();
 
 	m_RoundCount = 0;
+
 	m_aTeamscore[TEAM_RED] = g_Config.m_SvLives;
 	m_aTeamscore[TEAM_BLUE] = 0;
 	m_pTopFive->Reset(g_Config.m_SvLives, std::string(g_Config.m_SvMap));
@@ -836,10 +847,6 @@ void IGameController::Tick()
 	if((m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_GAME_PAUSED) && !GameServer()->m_World.m_ResetRequested)
 	{
         CheckZombie();
-		if(m_GameFlags&GAMEFLAG_SURVIVAL)
-			DoWincheckRound();
-		else
-			DoWincheckMatch();
 	}
 }
 
@@ -953,7 +960,17 @@ static bool IsSeparator(char c) { return c == ';' || c == ' ' || c == ',' || c =
 void IGameController::ChangeMap(const char *pToMap)
 {
 	str_copy(m_aMapWish, pToMap, sizeof(m_aMapWish));
+
+	m_MatchCount = m_GameInfo.m_MatchNum-1;
+	if(m_GameState == IGS_WARMUP_GAME || m_GameState == IGS_WARMUP_USER)
+		SetGameState(IGS_GAME_RUNNING);
 	EndMatch();
+
+	if(m_GameState != IGS_END_MATCH)
+	{
+		// game could not been ended, force cycle
+		CycleMap();
+	}
 }
 
 void IGameController::CycleMap()
@@ -971,14 +988,6 @@ void IGameController::CycleMap()
 	if(!str_length(g_Config.m_SvMaprotation))
 		return;
 
-	if(m_MatchCount < m_GameInfo.m_MatchNum-1)
-	{
-		if(g_Config.m_SvMatchSwap)
-			GameServer()->SwapTeams();
-		return;
-	}
-
-	// handle maprotation
 	const char *pMapRotation = g_Config.m_SvMaprotation;
 	const char *pCurrentMap = g_Config.m_SvMap;
 
@@ -1239,22 +1248,6 @@ int IGameController::GetStartTeam()
 	}
 	return TEAM_SPECTATORS;
 }
-
-/*void IGameController::StartWave(int Wave)
-{
-    std::vector<int> zomb_nums = m_CWave.GetZombNum(Wave);
-    for(int i = 0; i < (int)(sizeof(m_Zombie)/sizeof(m_Zombie[0])); i++)
-    {
-        m_Zombie[i] = zomb_nums[i];
-    }
-
-	//Message Shit
-	m_ZombLeft = 0;
-	for(int i = 0; i < (int)(sizeof(m_Zombie)/sizeof(m_Zombie[0])); i++)
-		m_ZombLeft += m_Zombie[i];
-
-	DoZombMessage(0);
-}*/
 
 void IGameController::CheckZombie()
 {

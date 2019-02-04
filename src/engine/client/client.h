@@ -255,8 +255,11 @@ public:
 	const char *LoadMap(const char *pName, const char *pFilename, unsigned WantedCrc);
 	const char *LoadMapSearch(const char *pMapName, int WantedCrc);
 
+<<<<<<< HEAD
 	static int PlayerScoreComp(const void *a, const void *b);
 
+=======
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	int UnpackServerInfo(CUnpacker *pUnpacker, CServerInfo *pInfo, int *pToken);
 	void ProcessConnlessPacket(CNetChunk *pPacket);
 	void ProcessServerPacket(CNetChunk *pPacket);
@@ -278,6 +281,10 @@ public:
 	bool LimitFps();
 	void Run();
 
+<<<<<<< HEAD
+=======
+	void ConnectOnStart(const char *pAddress);
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 	static void Con_Connect(IConsole::IResult *pResult, void *pUserData);
 	static void Con_Disconnect(IConsole::IResult *pResult, void *pUserData);
@@ -318,9 +325,12 @@ public:
 	void ToggleFullscreen();
 	void ToggleWindowBordered();
 	void ToggleWindowVSync();
+<<<<<<< HEAD
 
 	// Teeworlds connect link
 	const char * const m_pConLinkIdentifier;
 	void HandleTeeworldsConnectLink(const char *pConLink);
+=======
+>>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 };
 #endif

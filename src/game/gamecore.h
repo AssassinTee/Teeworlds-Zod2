@@ -156,7 +156,6 @@ public:
 	int m_HookState;
 	int m_HookedPlayer;
 
-	//
 	bool m_Zooker;
 
 	int m_Jumped;
