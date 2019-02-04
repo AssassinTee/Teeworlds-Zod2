@@ -11,7 +11,7 @@
 
 #include "eventhandler.h"
 #include "gameworld.h"
-#include "top5/topfivebase.h"
+#include "topfive/topfivebase.h"
 
 /*
 	Tick

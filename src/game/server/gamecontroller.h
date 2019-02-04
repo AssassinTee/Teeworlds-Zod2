@@ -7,7 +7,7 @@
 
 #include <generated/protocol.h>
 #include "wave.h"
-#include "top5/topfivebase.h"
+#include "topfive/topfivebase.h"
 
 /*
 	Class: Game Controller

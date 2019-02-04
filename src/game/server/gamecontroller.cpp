@@ -9,7 +9,7 @@
 #include "gamecontext.h"
 #include "gamecontroller.h"
 #include "player.h"
-#include "top5/topfivejson.h"
+#include "topfive/topfivejson.h"
 
 
 IGameController::IGameController(CGameContext *pGameServer) : m_CWave(pGameServer)

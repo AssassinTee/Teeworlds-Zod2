@@ -1383,9 +1383,9 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   player.cpp
   player.h
   tools/skinreader.h
-  top5/topfivebase.h
-  top5/topfivejson.h
-  top5/topfivejson.cpp
+  topfive/topfivebase.h
+  topfive/topfivejson.cpp
+  topfive/topfivejson.h
   wave.cpp
   wave.h
 )
