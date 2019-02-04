@@ -1163,7 +1163,7 @@ vec2 CCharacter::GetGrenadeAngle(vec2 m_StartPos, vec2 m_ToShoot, bool GrenadeBo
 	{
 		return vec2(0, 0);
 	}
-	char aBuf[128];
+	//char aBuf[128];
 	vec2 m_Direction;
 	float Curvature = GameServer()->Tuning()->m_GunCurvature;
 	if(GrenadeBot)
