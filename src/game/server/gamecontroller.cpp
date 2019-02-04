@@ -316,7 +316,6 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 			return false;
 	}
 
-	int Type = -1;
 	switch(Index)
 	{
 	case ENTITY_SPAWN:
