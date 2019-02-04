@@ -356,8 +356,6 @@ void CConsole::PossibleCommands(const char *pStr, int FlagMask, bool Temp, FPoss
 	}
 }
 
-<<<<<<< HEAD
-=======
 void CConsole::PossibleMaps(const char *pStr, FPossibleCallback pfnCallback, void *pUser)
 {
 	for(CMapListEntryTemp *pMapEntry = m_pFirstMapEntry; pMapEntry; pMapEntry = pMapEntry->m_pNext)
@@ -367,7 +365,6 @@ void CConsole::PossibleMaps(const char *pStr, FPossibleCallback pfnCallback, voi
 	}
 }
 
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 CConsole::CCommand *CConsole::FindCommand(const char *pName, int FlagMask)
 {
 	for(CCommand *pCommand = m_pFirstCommand; pCommand; pCommand = pCommand->m_pNext)
@@ -438,10 +435,7 @@ void CConsole::ExecuteFile(const char *pFilename)
 	{
 		str_format(aBuf, sizeof(aBuf), "failed to open '%s'", pFilename);
 		Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
-<<<<<<< HEAD
-=======
 		Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", "Info: only relative paths starting from the ones you specify in 'storage.cfg' are allowed");
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	}
 
 	m_pFirstExec = pPrev;
@@ -568,11 +562,7 @@ static void StrVariableCommand(IConsole::IResult *pResult, void *pUserData)
 			int Length = 0;
 			while(*pString)
 			{
-<<<<<<< HEAD
-				int Size = str_utf8_encode(Temp, static_cast<const unsigned char>(*pString++));
-=======
 				int Size = str_utf8_encode(Temp, static_cast<unsigned char>(*pString++));
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 				if(Length+Size < pData->m_MaxSize)
 				{
 					mem_copy(pData->m_pStr+Length, &Temp, Size);
@@ -672,13 +662,10 @@ CConsole::CConsole(int FlagMask)
 	m_StoreCommands = true;
 	m_paStrokeStr[0] = "0";
 	m_paStrokeStr[1] = "1";
-<<<<<<< HEAD
-=======
 	m_pTempMapListHeap = 0;
 	m_NumMapListEntries = 0;
 	m_pFirstMapEntry = 0;
 	m_pLastMapEntry = 0;
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	m_ExecutionQueue.Reset();
 	m_pFirstCommand = 0;
 	m_pFirstExec = 0;
@@ -736,11 +723,7 @@ void CConsole::ParseArguments(int NumArgs, const char **ppArguments)
 	for(int i = 0; i < NumArgs; i++)
 	{
 		// check for scripts to execute
-<<<<<<< HEAD
-		if(ppArguments[i][0] == '-' && ppArguments[i][1] == 'f' && ppArguments[i][2] == 0)
-=======
 		if(str_comp("-f", ppArguments[i]) == 0)
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		{
 			if(NumArgs - i > 1)
 				ExecuteFile(ppArguments[i+1]);
@@ -894,8 +877,6 @@ void CConsole::DeregisterTempAll()
 	m_pRecycleList = 0;
 }
 
-<<<<<<< HEAD
-=======
 void CConsole::RegisterTempMap(const char *pName)
 {
 	if(!m_pTempMapListHeap)
@@ -962,7 +943,6 @@ void CConsole::DeregisterTempMapAll()
 	m_NumMapListEntries = 0;
 }
 
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 void CConsole::Con_Chain(IResult *pResult, void *pUserData)
 {
 	CChain *pInfo = (CChain *)pUserData;

@@ -91,30 +91,21 @@ class CCommandProcessorFragment_OpenGL
 			STATE_EMPTY = 0,
 			STATE_TEX2D = 1,
 			STATE_TEX3D = 2,
-<<<<<<< HEAD
-		};
-		GLuint m_Tex2D;
-		GLuint m_Tex3D;
-=======
 
 			MIN_GL_MAX_3D_TEXTURE_SIZE = 64,																					// GL_MAX_3D_TEXTURE_SIZE must be at least 64 according to the standard
 			MAX_ARRAYSIZE_TEX3D = IGraphics::NUMTILES_DIMENSION * IGraphics::NUMTILES_DIMENSION / MIN_GL_MAX_3D_TEXTURE_SIZE,	// = 4
 		};
 		GLuint m_Tex2D;
 		GLuint m_Tex3D[MAX_ARRAYSIZE_TEX3D];
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		int m_State;
 		int m_Format;
 		int m_MemSize;
 	};
 	CTexture m_aTextures[CCommandBuffer::MAX_TEXTURES];
 	volatile int *m_pTextureMemoryUsage;
-<<<<<<< HEAD
-=======
 	int m_MaxTexSize;
 	int m_Max3DTexSize;
 	int m_TextureArraySize;
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 public:
 	enum
@@ -126,10 +117,7 @@ public:
 	{
 		SCommand_Init() : SCommand(CMD_INIT) {}
 		volatile int *m_pTextureMemoryUsage;
-<<<<<<< HEAD
-=======
 		int *m_pTextureArraySize;
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	};
 
 private:
@@ -208,19 +196,13 @@ class CGraphicsBackend_SDL_OpenGL : public CGraphicsBackend_Threaded
 	ICommandProcessor *m_pProcessor;
 	volatile int m_TextureMemoryUsage;
 	int m_NumScreens;
-<<<<<<< HEAD
-=======
 	int m_TextureArraySize;
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 public:
 	virtual int Init(const char *pName, int *Screen, int *Width, int *Height, int FsaaSamples, int Flags, int *pDesktopWidth, int *pDesktopHeight);
 	virtual int Shutdown();
 
 	virtual int MemoryUsage() const;
-<<<<<<< HEAD
-=======
 	virtual int GetTextureArraySize() const { return m_TextureArraySize; }
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 	virtual int GetNumScreens() const { return m_NumScreens; }
 

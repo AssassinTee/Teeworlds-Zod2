@@ -254,11 +254,7 @@ TOKEN CNetTokenCache::GetToken(const NETADDR *pAddr)
 
 void CNetTokenCache::FetchToken(const NETADDR *pAddr)
 {
-<<<<<<< HEAD
-	CNetBase::SendControlMsgWithToken(m_Socket, pAddr, NET_TOKEN_NONE, 0, 
-=======
 	CNetBase::SendControlMsgWithToken(m_Socket, pAddr, NET_TOKEN_NONE, 0,
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		NET_CTRLMSG_TOKEN, m_pTokenManager->GenerateToken(pAddr), true);
 }
 

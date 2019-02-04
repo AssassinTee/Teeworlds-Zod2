@@ -86,9 +86,6 @@ public:
 	{
 		// open logfile if needed
 		if(g_Config.m_Logfile[0])
-<<<<<<< HEAD
-			dbg_logger_file(g_Config.m_Logfile);
-=======
 		{
 			char aBuf[32];
 			if(g_Config.m_LogfileTimestamp)
@@ -99,7 +96,6 @@ public:
 			str_format(aLogFilename, sizeof(aLogFilename), "%s%s.txt", g_Config.m_Logfile, aBuf);
 			dbg_logger_file(aLogFilename);
 		}
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	}
 
 	void HostLookup(CHostLookup *pLookup, const char *pHostname, int Nettype)

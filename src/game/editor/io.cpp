@@ -179,8 +179,6 @@ int CEditorMap::Save(class IStorage *pStorage, const char *pFileName)
 		df.AddItem(MAPITEMTYPE_GROUP, GroupCount++, sizeof(GItem), &GItem);
 	}
 
-<<<<<<< HEAD
-=======
 	// check for bezier curve envelopes, otherwise use older, smaller envelope points
 	int Version = CMapItemEnvelope_v2::CURRENT_VERSION;
 	int Size = sizeof(CEnvPoint_v1);	
@@ -197,17 +195,12 @@ int CEditorMap::Save(class IStorage *pStorage, const char *pFileName)
 		}
 	}
 
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	// save envelopes
 	int PointCount = 0;
 	for(int e = 0; e < m_lEnvelopes.size(); e++)
 	{
 		CMapItemEnvelope Item;
-<<<<<<< HEAD
-		Item.m_Version = CMapItemEnvelope::CURRENT_VERSION;
-=======
 		Item.m_Version = Version;
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		Item.m_Channels = m_lEnvelopes[e]->m_Channels;
 		Item.m_StartPoint = PointCount;
 		Item.m_NumPoints = m_lEnvelopes[e]->m_lPoints.size();
@@ -219,17 +212,6 @@ int CEditorMap::Save(class IStorage *pStorage, const char *pFileName)
 	}
 
 	// save points
-<<<<<<< HEAD
-	int TotalSize = sizeof(CEnvPoint) * PointCount;
-	CEnvPoint *pPoints = (CEnvPoint *)mem_alloc(TotalSize, 1);
-	PointCount = 0;
-
-	for(int e = 0; e < m_lEnvelopes.size(); e++)
-	{
-		int Count = m_lEnvelopes[e]->m_lPoints.size();
-		mem_copy(&pPoints[PointCount], m_lEnvelopes[e]->m_lPoints.base_ptr(), sizeof(CEnvPoint)*Count);
-		PointCount += Count;
-=======
 	int TotalSize = Size * PointCount;
 	unsigned char *pPoints = (unsigned char *)mem_alloc(TotalSize, 1);
 	int Offset = 0;
@@ -240,7 +222,6 @@ int CEditorMap::Save(class IStorage *pStorage, const char *pFileName)
 			mem_copy(pPoints + Offset, &(m_lEnvelopes[e]->m_lPoints[p]), Size);
 			Offset += Size;
 		}
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	}
 
 	df.AddItem(MAPITEMTYPE_ENVPOINTS, 0, TotalSize, pPoints);

@@ -52,11 +52,7 @@ public:
 	// old foolish interface
 	virtual void TextColor(float r, float g, float b, float a) = 0;
 	virtual void TextOutlineColor(float r, float g, float b, float a) = 0;
-<<<<<<< HEAD
-	virtual void Text(void *pFontSetV, float x, float y, float Size, const char *pText, int MaxWidth) = 0;
-=======
 	virtual void Text(void *pFontSetV, float x, float y, float Size, const char *pText, int MaxWidth, bool MultiLine=true) = 0;
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	virtual float TextWidth(void *pFontSetV, float Size, const char *pText, int Length) = 0;
 	virtual int TextLineCount(void *pFontSetV, float Size, const char *pText, float LineWidth) = 0;
 

@@ -6,20 +6,12 @@
 class CInput : public IEngineInput
 {
 	IEngineGraphics *m_pGraphics;
-<<<<<<< HEAD
-
-	int m_InputGrabbed;
-
-	int64 m_LastRelease;
-	int64 m_ReleaseDelta;
-=======
 	IConsole *m_pConsole;
 
 	int m_InputGrabbed;
 	char *m_pClipboardText;
 
 	bool m_MouseDoubleClick;
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 	void AddEvent(char *pText, int Key, int Flags);
 	void Clear();
@@ -37,10 +29,7 @@ class CInput : public IEngineInput
 
 public:
 	CInput();
-<<<<<<< HEAD
-=======
 	~CInput();
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 	virtual void Init();
 
@@ -51,11 +40,8 @@ public:
 	virtual void MouseModeAbsolute();
 	virtual void MouseModeRelative();
 	virtual int MouseDoubleClick();
-<<<<<<< HEAD
-=======
 	virtual const char *GetClipboardText();
 	virtual void SetClipboardText(const char *pText);
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 	virtual int Update();
 };

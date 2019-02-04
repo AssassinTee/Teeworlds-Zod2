@@ -3,11 +3,7 @@
 #ifndef GAME_EDITOR_EDITOR_H
 #define GAME_EDITOR_EDITOR_H
 
-<<<<<<< HEAD
-#include <math.h>
-=======
 #include <algorithm>
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 #include <base/math.h>
 #include <base/system.h>
@@ -71,11 +67,7 @@ public:
 
 	void Resort()
 	{
-<<<<<<< HEAD
-		sort(m_lPoints.all());
-=======
 		std::stable_sort(&m_lPoints[0], &m_lPoints[m_lPoints.size()]);
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		FindTopBottom(0xf);
 	}
 
@@ -294,10 +286,7 @@ public:
 	char m_aName[128];
 	unsigned char m_aTileFlags[256];
 	class IAutoMapper *m_pAutoMapper;
-<<<<<<< HEAD
-=======
 	bool operator<(const CEditorImage &Other) const { return str_comp(m_aName, Other.m_aName); }
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 };
 
 class CEditorMap
@@ -364,11 +353,7 @@ public:
 		if(Index1 < 0 || Index1 >= m_lGroups.size()) return Index0;
 		if(Index0 == Index1) return Index0;
 		m_Modified = true;
-<<<<<<< HEAD
-		swap(m_lGroups[Index0], m_lGroups[Index1]);
-=======
 		tl_swap(m_lGroups[Index0], m_lGroups[Index1]);
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		return Index1;
 	}
 

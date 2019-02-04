@@ -77,11 +77,7 @@ public:
 	{
 		if(FindInterfaceInfo(pName) == 0)
 		{
-<<<<<<< HEAD
-			dbg_msg("kernel", "ERROR: couldn't reregister interface '%s'. interface doesn't exist");
-=======
 			dbg_msg("kernel", "ERROR: couldn't reregister interface '%s'. interface doesn't exist", pName);
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 			return false;
 		}
 

@@ -1,14 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <new>
-<<<<<<< HEAD
-
-#include <immintrin.h> //_mm_pause
-#include <stdlib.h> // qsort
-=======
 #include <algorithm>
 
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 #include <stdarg.h>
 
 #include <base/math.h>
@@ -245,11 +239,7 @@ void CSmoothTime::Update(CGraph *pGraph, int64 Target, int TimeLeft, int AdjustD
 		UpdateInt(Target);
 }
 
-<<<<<<< HEAD
-CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotDelta), m_pConLinkIdentifier("teeworlds:")
-=======
 CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotDelta)
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 {
 	m_pEditor = 0;
 	m_pInput = 0;
@@ -519,10 +509,7 @@ void CClient::Connect(const char *pAddress)
 	}
 
 	m_RconAuthed = 0;
-<<<<<<< HEAD
-=======
 	m_UseTempRconCommands = 0;
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	if(m_ServerAddress.port == 0)
 		m_ServerAddress.port = Port;
 	m_NetClient.Connect(&m_ServerAddress);
@@ -835,24 +822,6 @@ const char *CClient::LoadMapSearch(const char *pMapName, int WantedCrc)
 	return pError;
 }
 
-<<<<<<< HEAD
-int CClient::PlayerScoreComp(const void *a, const void *b)
-{
-	CServerInfo::CClient *p0 = (CServerInfo::CClient *)a;
-	CServerInfo::CClient *p1 = (CServerInfo::CClient *)b;
-	if(!(p0->m_PlayerType&CServerInfo::CClient::PLAYERFLAG_SPEC) && (p1->m_PlayerType&CServerInfo::CClient::PLAYERFLAG_SPEC))
-		return -1;
-	if((p0->m_PlayerType&CServerInfo::CClient::PLAYERFLAG_SPEC) && !(p1->m_PlayerType&CServerInfo::CClient::PLAYERFLAG_SPEC))
-		return 1;
-	if(p0->m_Score == p1->m_Score)
-		return 0;
-	if(p0->m_Score < p1->m_Score)
-		return 1;
-	return -1;
-}
-
-=======
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 int CClient::UnpackServerInfo(CUnpacker *pUnpacker, CServerInfo *pInfo, int *pToken)
 {
 	if(pToken)
@@ -875,11 +844,7 @@ int CClient::UnpackServerInfo(CUnpacker *pUnpacker, CServerInfo *pInfo, int *pTo
 	pInfo->m_NumBotSpectators = 0;
 
 	// don't add invalid info to the server browser list
-<<<<<<< HEAD
-	if(pInfo->m_NumClients < 0 || pInfo->m_NumClients > MAX_CLIENTS || pInfo->m_MaxClients < 0 || pInfo->m_MaxClients > MAX_CLIENTS ||
-=======
 	if(pInfo->m_NumClients < 0 || pInfo->m_NumClients > pInfo->m_MaxClients || pInfo->m_MaxClients < 0 || pInfo->m_MaxClients > MAX_CLIENTS ||
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		pInfo->m_NumPlayers < 0 || pInfo->m_NumPlayers > pInfo->m_NumClients || pInfo->m_MaxPlayers < 0 || pInfo->m_MaxPlayers > pInfo->m_MaxClients)
 		return -1;
 	// drop standard gametype with more than MAX_PLAYERS
@@ -1029,11 +994,7 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 		int Token;
 		if(!UnpackServerInfo(&Up, &Info, &Token) && !Up.Error())
 		{
-<<<<<<< HEAD
-			qsort(Info.m_aClients, Info.m_NumClients, sizeof(*Info.m_aClients), PlayerScoreComp);
-=======
 			std::stable_sort(Info.m_aClients, Info.m_aClients + Info.m_NumClients);
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 			m_ServerBrowser.Set(pPacket->m_Address, CServerBrowser::SET_TOKEN, Token, &Info);
 		}
 	}
@@ -1172,11 +1133,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 			net_addr_str(&pPacket->m_Address, Info.m_aAddress, sizeof(Info.m_aAddress), true);
 			if(!UnpackServerInfo(&Unpacker, &Info, 0) && !Unpacker.Error())
 			{
-<<<<<<< HEAD
-				qsort(Info.m_aClients, Info.m_NumClients, sizeof(*Info.m_aClients), PlayerScoreComp);
-=======
 				std::stable_sort(Info.m_aClients, Info.m_aClients + Info.m_NumClients);
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 				mem_copy(&m_CurrentServerInfo, &Info, sizeof(m_CurrentServerInfo));
 				m_CurrentServerInfo.m_NetAddr = m_ServerAddress;
 			}
@@ -1204,8 +1161,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 			if(Unpacker.Error() == 0)
 				m_pConsole->DeregisterTemp(pName);
 		}
-<<<<<<< HEAD
-=======
 		else if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && Msg == NETMSG_MAPLIST_ENTRY_ADD)
 		{
 			const char *pName = Unpacker.GetString(CUnpacker::SANITIZE_CC);
@@ -1218,7 +1173,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 			if(Unpacker.Error() == 0)
 				m_pConsole->DeregisterTempMap(pName);
 		}
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		else if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && Msg == NETMSG_RCON_AUTH_ON)
 		{
 			m_RconAuthed = 1;
@@ -1230,10 +1184,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 			if(m_UseTempRconCommands)
 				m_pConsole->DeregisterTempAll();
 			m_UseTempRconCommands = 0;
-<<<<<<< HEAD
-=======
 			m_pConsole->DeregisterTempMapAll();
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		}
 		else if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && Msg == NETMSG_RCON_LINE)
 		{
@@ -1823,11 +1774,7 @@ bool CClient::LimitFps()
 			Now = time_get();
 			RenderDeltaTime = (Now - LastT) / Freq;
 			d = DesiredTime - RenderDeltaTime;
-<<<<<<< HEAD
-			_mm_pause();
-=======
 			cpu_relax();
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		}
 
 		SkipFrame = false;
@@ -1849,13 +1796,8 @@ bool CClient::LimitFps()
 	   (Now - DbgLastSkippedDbgMsg) / (double)time_freq() > 5.0)
 	{
 		char aBuf[128];
-<<<<<<< HEAD
-		str_format(aBuf, sizeof(aBuf), "LimitFps: FramesSkippedCount=%d TimeWaited=%.3f (per sec)",
-				   DbgFramesSkippedCount/5,
-=======
 		str_format(aBuf, sizeof(aBuf), "LimitFps: FramesSkippedCount=%lu TimeWaited=%.3f (per sec)",
 				   (unsigned long)(DbgFramesSkippedCount/5),
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 				   DbgTimeWaited/5.0);
 		m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "client", aBuf);
 		DbgFramesSkippedCount = 0;
@@ -2476,15 +2418,9 @@ static CClient *CreateClient()
 	return new(pClient) CClient;
 }
 
-<<<<<<< HEAD
-void CClient::HandleTeeworldsConnectLink(const char *pConLink)
-{
-	str_copy(m_aCmdConnect, pConLink, sizeof(m_aCmdConnect));
-=======
 void CClient::ConnectOnStart(const char *pAddress)
 {
 	str_copy(m_aCmdConnect, pAddress, sizeof(m_aCmdConnect));
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 }
 
 /*
@@ -2512,10 +2448,6 @@ int main(int argc, const char **argv) // ignore_convention
 	#else
 	bool HideConsole = false;
 	#endif
-<<<<<<< HEAD
-	for(int i = 1; i < argc; i++) // ignore_convention
-	{
-=======
 	bool QuickEditMode = false;
 	for(int i = 1; i < argc; i++) // ignore_convention
 	{
@@ -2523,7 +2455,6 @@ int main(int argc, const char **argv) // ignore_convention
 		{
 			QuickEditMode = true;
 		}
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		if(str_comp("-c", argv[i]) == 0 || str_comp("--console", argv[i]) == 0) // ignore_convention
 		{
 			HideConsole = false;
@@ -2538,11 +2469,8 @@ int main(int argc, const char **argv) // ignore_convention
 
 	if(HideConsole)
 		FreeConsole();
-<<<<<<< HEAD
-=======
 	else if(!QuickEditMode)
 		dbg_console_init();
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 #endif
 
 	bool UseDefaultConfig = false;
@@ -2626,24 +2554,6 @@ int main(int argc, const char **argv) // ignore_convention
 		// parse the command line arguments
 		if(argc > 1) // ignore_convention
 		{
-<<<<<<< HEAD
-			switch(argc) // ignore_convention
-			{
-			case 2:
-			{
-				// handle Teeworlds connect link
-				const int Length = str_length(pClient->m_pConLinkIdentifier);
-				if(str_comp_num(pClient->m_pConLinkIdentifier, argv[1], Length) == 0) // ignore_convention
-				{
-					pClient->HandleTeeworldsConnectLink(argv[1] + Length); // ignore_convention
-					break;
-				}
-			}
-			default:
-				pConsole->ParseArguments(argc - 1, &argv[1]); // ignore_convention
-			}
-
-=======
 			const char *pAddress = 0;
 			if(argc == 2)
 			{
@@ -2657,7 +2567,6 @@ int main(int argc, const char **argv) // ignore_convention
 			{
 				pConsole->ParseArguments(argc - 1, &argv[1]);
 			}
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 		}
 	}
 
@@ -2673,13 +2582,10 @@ int main(int argc, const char **argv) // ignore_convention
 	// write down the config and quit
 	pConfig->Save();
 
-<<<<<<< HEAD
-=======
 #if defined(CONF_FAMILY_WINDOWS)
 	if(!HideConsole && !QuickEditMode)
 		dbg_console_cleanup();
 #endif
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	// free components
 	mem_free(pClient);
 	delete pKernel;

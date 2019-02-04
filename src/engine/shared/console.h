@@ -57,11 +57,7 @@ class CConsole : public IConsole
 	static void ConToggle(IResult *pResult, void *pUser);
 	static void ConToggleStroke(IResult *pResult, void *pUser);
 	static void ConModCommandAccess(IResult *pResult, void *pUser);
-<<<<<<< HEAD
-	static void ConModCommandStatus(IConsole::IResult *pResult, void *pUser);
-=======
 	static void ConModCommandStatus(IResult *pResult, void *pUser);
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 	void ExecuteFileRecurse(const char *pFilename);
 	void ExecuteLineStroked(int Stroke, const char *pStr);
@@ -158,8 +154,6 @@ class CConsole : public IConsole
 	void AddCommandSorted(CCommand *pCommand);
 	CCommand *FindCommand(const char *pName, int FlagMask);
 
-<<<<<<< HEAD
-=======
 	struct CMapListEntryTemp {
 		CMapListEntryTemp *m_pPrev;
 		CMapListEntryTemp *m_pNext;
@@ -171,7 +165,6 @@ class CConsole : public IConsole
 	CMapListEntryTemp *m_pFirstMapEntry;
 	CMapListEntryTemp *m_pLastMapEntry;
 
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 public:
 	CConsole(int FlagMask);
 	~CConsole();
@@ -179,22 +172,16 @@ public:
 	virtual const CCommandInfo *FirstCommandInfo(int AccessLevel, int FlagMask) const;
 	virtual const CCommandInfo *GetCommandInfo(const char *pName, int FlagMask, bool Temp);
 	virtual void PossibleCommands(const char *pStr, int FlagMask, bool Temp, FPossibleCallback pfnCallback, void *pUser);
-<<<<<<< HEAD
-=======
 	virtual void PossibleMaps(const char *pStr, FPossibleCallback pfnCallback, void *pUser);
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 
 	virtual void ParseArguments(int NumArgs, const char **ppArguments);
 	virtual void Register(const char *pName, const char *pParams, int Flags, FCommandCallback pfnFunc, void *pUser, const char *pHelp);
 	virtual void RegisterTemp(const char *pName, const char *pParams, int Flags, const char *pHelp);
 	virtual void DeregisterTemp(const char *pName);
 	virtual void DeregisterTempAll();
-<<<<<<< HEAD
-=======
 	virtual void RegisterTempMap(const char *pName);
 	virtual void DeregisterTempMap(const char *pName);
 	virtual void DeregisterTempMapAll();
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	virtual void Chain(const char *pName, FChainCommandCallback pfnChainFunc, void *pUser);
 	virtual void StoreCommands(bool Store);
 

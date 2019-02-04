@@ -24,11 +24,7 @@ bool CNetServer::Open(NETADDR BindAddr, CNetBan *pNetBan, int MaxClients, int Ma
 	m_pNetBan = pNetBan;
 
 	// clamp clients
-<<<<<<< HEAD
-	m_MaxClients = MaxClients;//MaxClients;
-=======
 	m_MaxClients = MaxClients;
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 	if(m_MaxClients > NET_MAX_CLIENTS)
 		m_MaxClients = NET_MAX_CLIENTS;
 	if(m_MaxClients < 1)
@@ -124,12 +120,6 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 		{
 			// check for bans
 			char aBuf[128];
-<<<<<<< HEAD
-			if(NetBan() && NetBan()->IsBanned(&Addr, aBuf, sizeof(aBuf)))
-			{
-				// banned, reply with a message
-				CNetBase::SendControlMsg(m_Socket, &Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, aBuf, str_length(aBuf)+1);
-=======
 			int LastInfoQuery;
 			if(NetBan() && NetBan()->IsBanned(&Addr, aBuf, sizeof(aBuf), &LastInfoQuery))
 			{
@@ -139,7 +129,6 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 				{
 					CNetBase::SendControlMsg(m_Socket, &Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, aBuf, str_length(aBuf) + 1);
 				}
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 				continue;
 			}
 
