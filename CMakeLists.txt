@@ -1376,22 +1376,18 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   gamecontext.h
   gamecontroller.cpp
   gamecontroller.h
-  gamemodes/ctf.cpp
-  gamemodes/ctf.h
-  gamemodes/dm.cpp
-  gamemodes/dm.h
-  gamemodes/lms.cpp
-  gamemodes/lms.h
-  gamemodes/lts.cpp
-  gamemodes/lts.h
-  gamemodes/mod.cpp
-  gamemodes/mod.h
-  gamemodes/tdm.cpp
-  gamemodes/tdm.h
+  gamemodes/zod.cpp
+  gamemodes/zod.h
   gameworld.cpp
   gameworld.h
   player.cpp
   player.h
+  wave.cpp
+  wave.h
+  top5/topfivejson.h
+  top5/topfivebase.h
+  top5/topfivejson.cpp
+  tools/skinreader.h
 )
 set(GAME_GENERATED_SERVER
   src/generated/server_data.cpp
