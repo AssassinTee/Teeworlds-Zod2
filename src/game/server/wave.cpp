@@ -168,7 +168,7 @@ void CWave::DoLifeMessage(int Life)
 	}
 	else if(Life == 1)
 	{
-		str_format(aBuf, sizeof(aBuf), "!!!Only 1 life left!!!", Life);
+		str_format(aBuf, sizeof(aBuf), "!!!Only 1 life left!!!");
 		GameServer()->SendBroadcast(aBuf, -1);
 		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 	}
