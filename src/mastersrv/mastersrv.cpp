@@ -296,7 +296,7 @@ int main(int argc, const char **argv) // ignore_convention
 	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_BASIC, argc, argv);
 	IConfig *pConfig = CreateConfig();
 	m_pConsole = CreateConsole(FlagMask);
-
+	
 	bool RegisterFail = !pKernel->RegisterInterface(pStorage);
 	RegisterFail |= !pKernel->RegisterInterface(m_pConsole);
 	RegisterFail |= !pKernel->RegisterInterface(pConfig);
@@ -350,11 +350,7 @@ int main(int argc, const char **argv) // ignore_convention
 		while(m_NetOp.Recv(&Packet, &Token))
 		{
 			// check if the server is banned
-<<<<<<< HEAD
-			if(m_NetBan.IsBanned(&Packet.m_Address, 0, 0))
-=======
 			if(m_NetBan.IsBanned(&Packet.m_Address, 0, 0, 0))
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 				continue;
 
 			if(Packet.m_DataSize == sizeof(SERVERBROWSE_HEARTBEAT)+2 &&
@@ -409,11 +405,7 @@ int main(int argc, const char **argv) // ignore_convention
 		while(m_NetChecker.Recv(&Packet, &Token))
 		{
 			// check if the server is banned
-<<<<<<< HEAD
-			if(m_NetBan.IsBanned(&Packet.m_Address, 0, 0))
-=======
 			if(m_NetBan.IsBanned(&Packet.m_Address, 0, 0, 0))
->>>>>>> 5e01ed335279b8b16e79add38e4cb6e7564c5d32
 				continue;
 
 			if(Packet.m_DataSize == sizeof(SERVERBROWSE_FWRESPONSE) &&
