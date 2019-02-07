@@ -278,6 +278,9 @@ void CGameContext::SendCommand(int ChatterClientID, const std::string& command)
         messageList.push_back("Zod (Zombie-Mod) by /\\ssa (AssassinTee)");
         messageList.push_back("You like it? Give me a Star on GitHub!");
         messageList.push_back("https://github.com/AssassinTee/Teeworlds-Zod2");
+        std::stringstream ss;
+        ss << "Teeworlds version: '" << GAME_RELEASE_VERSION << "'";
+        messageList.push_back(ss.str());
     }
     else if(command == "top5")
     {
@@ -436,7 +439,7 @@ void CGameContext::StartVote(const char *pDesc, const char *pCommand, const char
 
 	// reset votes
 	m_VoteEnforce = VOTE_ENFORCE_UNKNOWN;
-	for(int i = 0; i < MAX_CLIENTS; i++)
+	for(int i = 0; i < 4; i++)
 	{
 		if(m_apPlayers[i])
 		{
@@ -604,11 +607,11 @@ void CGameContext::OnTick()
 			{
 				// count votes
 				char aaBuf[MAX_CLIENTS][NETADDR_MAXSTRSIZE] = {{0}};
-				for(int i = 0; i < MAX_CLIENTS; i++)
+				for(int i = 0; i < 4; i++)
 					if(m_apPlayers[i])
 						Server()->GetClientAddr(i, aaBuf[i], NETADDR_MAXSTRSIZE);
-				bool aVoteChecked[MAX_CLIENTS] = {0};
-				for(int i = 0; i < MAX_CLIENTS; i++)
+				bool aVoteChecked[4] = {0};
+				for(int i = 0; i < 4; i++)
 				{
 					if(!m_apPlayers[i] || m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS || aVoteChecked[i])	// don't count in votes by spectators
 						continue;
@@ -617,7 +620,7 @@ void CGameContext::OnTick()
 					int ActVotePos = m_apPlayers[i]->m_VotePos;
 
 					// check for more players with the same ip (only use the vote of the one who voted first)
-					for(int j = i+1; j < MAX_CLIENTS; ++j)
+					for(int j = i+1; j < 4; ++j)
 					{
 						if(!m_apPlayers[j] || aVoteChecked[j] || str_comp(aaBuf[j], aaBuf[i]))
 							continue;
@@ -638,7 +641,7 @@ void CGameContext::OnTick()
 				}
 			}
 
-			if(m_VoteEnforce == VOTE_ENFORCE_YES || (m_VoteUpdate && Yes >= Total/2+1))
+			if(m_VoteEnforce == VOTE_ENFORCE_YES || (m_VoteUpdate && Yes == Total))
 			{
 				Server()->SetRconCID(IServer::RCON_CID_VOTE);
 				Console()->ExecuteLine(m_aVoteCommand);
@@ -648,7 +651,7 @@ void CGameContext::OnTick()
 
 				EndVote(VOTE_END_PASS, m_VoteEnforce==VOTE_ENFORCE_YES);
 			}
-			else if(m_VoteEnforce == VOTE_ENFORCE_NO || (m_VoteUpdate && No >= (Total+1)/2) || time_get() > m_VoteCloseTime)
+			else if(m_VoteEnforce == VOTE_ENFORCE_NO || (m_VoteUpdate && No >= 1) || time_get() > m_VoteCloseTime)
 				EndVote(VOTE_END_FAIL, m_VoteEnforce==VOTE_ENFORCE_NO);
 			else if(m_VoteUpdate)
 			{
