@@ -846,6 +846,7 @@ void IGameController::Tick()
 	if((m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_GAME_PAUSED) && !GameServer()->m_World.m_ResetRequested)
 	{
         CheckZombie();
+        DoWincheckMatch();
 	}
 }
 
