@@ -606,7 +606,7 @@ void CGameContext::OnTick()
 			if(m_VoteUpdate)
 			{
 				// count votes
-				char aaBuf[g_Config.m_SvPlayerSlots][NETADDR_MAXSTRSIZE] = {{0}};
+				char aaBuf[MAX_CLIENTS][NETADDR_MAXSTRSIZE] = {{0}};
 				for(int i = 0; i < g_Config.m_SvPlayerSlots; i++)
 					if(m_apPlayers[i])
 						Server()->GetClientAddr(i, aaBuf[i], NETADDR_MAXSTRSIZE);
