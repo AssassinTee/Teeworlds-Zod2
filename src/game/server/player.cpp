@@ -1,5 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <engine/shared/config.h>
 
 #include "entities/character.h"
 #include "entities/flag.h"
@@ -20,7 +21,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, int Zombie
 	m_ScoreStartTick = Server()->Tick();
 	m_pCharacter = 0;
 	m_ClientID = ClientID;
-	m_Team = ClientID < 4 ? TEAM_RED : TEAM_BLUE;//GameServer()->m_pController->GetStartTeam();
+	m_Team = ClientID < g_Config.m_SvPlayerSlots ? TEAM_RED : TEAM_BLUE;//GameServer()->m_pController->GetStartTeam();
 	m_SpecMode = SPEC_FREEVIEW;
 	m_SpectatorID = -1;
 	m_pSpecFlag = 0;

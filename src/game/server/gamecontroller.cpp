@@ -63,7 +63,7 @@ void IGameController::DoActivityCheck()
 	if(g_Config.m_SvInactiveKickTime == 0)
 		return;
 
-	for(int i = 0; i < 4; ++i)
+	for(int i = 0; i < g_Config.m_SvPlayerSlots; ++i)
 	{
 		if(GameServer()->m_apPlayers[i] && !GameServer()->m_apPlayers[i]->IsDummy() && (GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS || g_Config.m_SvInactiveKick > 0) &&
 			!Server()->IsAuthed(i) && (GameServer()->m_apPlayers[i]->m_InactivityTickCounter > g_Config.m_SvInactiveKickTime*Server()->TickSpeed()*60))
@@ -109,7 +109,7 @@ void IGameController::DoActivityCheck()
 
 bool IGameController::GetPlayersReadyState(int WithoutID)
 {
-	for(int i = 0; i < MAX_CLIENTS; ++i)
+	for(int i = 0; i < g_Config.m_SvPlayerSlots; ++i)
 	{
 		if(i == WithoutID)
 			continue; // skip
@@ -122,7 +122,7 @@ bool IGameController::GetPlayersReadyState(int WithoutID)
 
 void IGameController::SetPlayersReadyState(bool ReadyState)
 {
-	for(int i = 0; i < MAX_CLIENTS; ++i)
+	for(int i = 0; i < g_Config.m_SvPlayerSlots; ++i)
 	{
 		if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS && (ReadyState || !GameServer()->m_apPlayers[i]->m_DeadSpecMode))
 			GameServer()->m_apPlayers[i]->m_IsReadyToPlay = ReadyState;
@@ -432,7 +432,7 @@ void IGameController::CheckReadyStates(int WithoutID)
 
 void IGameController::OnReset()
 {
-	for(int i = 0; i < MAX_CLIENTS; i++)
+	for(int i = 0; i < MAX_CHARACTERS; i++)
 	{
 		if(GameServer()->m_apPlayers[i])
 		{
@@ -942,7 +942,7 @@ void IGameController::UpdateGameInfo(int ClientID)
 
 	if(ClientID == -1)
 	{
-		for(int i = 0; i < 4; ++i)
+		for(int i = 0; i < g_Config.m_SvPlayerSlots; ++i)
 		{
 			if(!GameServer()->m_apPlayers[i] || !Server()->ClientIngame(i))
 				continue;
@@ -1255,7 +1255,7 @@ void IGameController::CheckZombie()
 		return;
 
     int counter = 0;
-	for(int i = 4; i < 64 && counter < g_Config.m_SvMaxZombieSpawn; i++)//i = 4, 0 a. 1 a. 2 a. 3 reserved//limit zombies spawning per tick
+	for(int i = g_Config.m_SvPlayerSlots; i < MAX_CHARACTERS && counter < g_Config.m_SvMaxZombieSpawn; i++)//i = 4, 0 a. 1 a. 2 a. 3 reserved//limit zombies spawning per tick
 	{
 		if(!GameServer()->m_apPlayers[i])//Check if the CID is free
 		{
@@ -1271,7 +1271,7 @@ void IGameController::CheckZombie()
 bool IGameController::EndWave()
 {
     int k;
-	for(k = 0; k < 4; k++)
+	for(k = 0; k < g_Config.m_SvPlayerSlots; k++)
 	{
 		if(GameServer()->m_apPlayers[k])//Make sure a player is there
 		{
@@ -1295,7 +1295,7 @@ bool IGameController::EndWave()
 void IGameController::SaveTopFive()
 {
     m_pTopFive->SetWave(m_CWave.GetWave());
-    for(int i = 0; i < 4; ++i)
+    for(int i = 0; i < g_Config.m_SvPlayerSlots; ++i)
     {
         if(Server()->ClientIngame(i))
         {
@@ -1309,7 +1309,7 @@ void IGameController::SaveTopFive()
 void IGameController::DespawnZombies(bool every_zomb)
 {
     int counter = 0;
-    for(int i = 4; i < 64; i++)
+    for(int i = g_Config.m_SvPlayerSlots; i < MAX_CHARACTERS; i++)
     {
         if(GameServer()->DisconnectZombie(i))
         {
