@@ -439,7 +439,7 @@ void CGameContext::StartVote(const char *pDesc, const char *pCommand, const char
 
 	// reset votes
 	m_VoteEnforce = VOTE_ENFORCE_UNKNOWN;
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i < g_Config.m_SvPlayerSlots; i++)
 	{
 		if(m_apPlayers[i])
 		{
@@ -606,12 +606,12 @@ void CGameContext::OnTick()
 			if(m_VoteUpdate)
 			{
 				// count votes
-				char aaBuf[MAX_CLIENTS][NETADDR_MAXSTRSIZE] = {{0}};
-				for(int i = 0; i < 4; i++)
+				char aaBuf[g_Config.m_SvPlayerSlots][NETADDR_MAXSTRSIZE] = {{0}};
+				for(int i = 0; i < g_Config.m_SvPlayerSlots; i++)
 					if(m_apPlayers[i])
 						Server()->GetClientAddr(i, aaBuf[i], NETADDR_MAXSTRSIZE);
-				bool aVoteChecked[4] = {0};
-				for(int i = 0; i < 4; i++)
+				bool aVoteChecked[g_Config.m_SvPlayerSlots] = {0};
+				for(int i = 0; i < g_Config.m_SvPlayerSlots; i++)
 				{
 					if(!m_apPlayers[i] || m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS || aVoteChecked[i])	// don't count in votes by spectators
 						continue;
@@ -620,7 +620,7 @@ void CGameContext::OnTick()
 					int ActVotePos = m_apPlayers[i]->m_VotePos;
 
 					// check for more players with the same ip (only use the vote of the one who voted first)
-					for(int j = i+1; j < 4; ++j)
+					for(int j = i+1; j < g_Config.m_SvPlayerSlots; ++j)
 					{
 						if(!m_apPlayers[j] || aVoteChecked[j] || str_comp(aaBuf[j], aaBuf[i]))
 							continue;
@@ -746,7 +746,7 @@ void CGameContext::OnClientEnter(int ClientID)
 		NewClientInfoMsg.m_aSkinPartColors[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aSkinPartColors[p];
 	}
 
-	for(int i = 0; i < 64; ++i)
+	for(int i = 0; i < MAX_CHARACTERS; ++i)//Send all characters
 	{
 		if(i == ClientID || !m_apPlayers[i] || (!Server()->ClientIngame(i) && !m_apPlayers[i]->IsDummy() && !m_apPlayers[i]->GetZomb()))
 			continue;
@@ -792,7 +792,7 @@ void CGameContext::OnZombie(int ClientID, int Zomb)
     /*char bBuf[128];
     str_format(bBuf, sizeof(bBuf), "Create zombie of type '%d'", Zomb);
     Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "zombie", bBuf);*/
-	if(ClientID >= 64) //|| //m_apPlayers[ClientID])
+	if(ClientID >= MAX_CHARACTERS) //|| //m_apPlayers[ClientID])
 			return;
     m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, false, Zomb);
 	m_apPlayers[ClientID]->Respawn();
@@ -832,7 +832,7 @@ void CGameContext::OnZombie(int ClientID, int Zomb)
 		NewClientInfoMsg.m_aSkinPartColors[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aSkinPartColors[p];
 	}
 
-    for(int i = 0; i < 4; ++i)
+    for(int i = 0; i < g_Config.m_SvPlayerSlots; ++i)
 	{
 		if(i == ClientID || !m_apPlayers[i] || (!Server()->ClientIngame(i) && !m_apPlayers[i]->IsDummy()))
 			continue;
@@ -847,7 +847,7 @@ void CGameContext::OnZombie(int ClientID, int Zomb)
 
 void CGameContext::OnZombieKill(int VictimID, int KillerID)
 {
-    if(VictimID >= 4) {
+    if(VictimID >= g_Config.m_SvPlayerSlots) {
 
 
         if(DisconnectZombie(VictimID))
@@ -858,13 +858,13 @@ void CGameContext::OnZombieKill(int VictimID, int KillerID)
         }
 
     }
-    else if(KillerID >= 4)//Died by Zombie, not himself!
+    else if(KillerID >= g_Config.m_SvPlayerSlots)//Died by Zombie, not himself!
     {
         m_pController->SetTeamscore(TEAM_RED, m_pController->GetTeamscore(TEAM_RED)-1);
         m_pController->GetWaveHandler()->DoLifeMessage(m_pController->GetTeamscore(TEAM_RED));
     }
     //Stats
-    if(KillerID >= 0 && KillerID < 4)
+    if(KillerID >= 0 && KillerID < g_Config.m_SvPlayerSlots)
     {
 
         m_pController->GetTopFive()->IncreasePlayerKill(KillerID);
@@ -880,7 +880,7 @@ void CGameContext::OnZombieKill(int VictimID, int KillerID)
 bool CGameContext::DisconnectZombie(int ClientID)
 {
     //Send fucking netmessage
-    if(!m_apPlayers[ClientID] || ClientID < 4)
+    if(!m_apPlayers[ClientID] || ClientID < g_Config.m_SvPlayerSlots)
         return false;
     CNetMsg_Sv_ClientDrop Msg;
     Msg.m_ClientID = ClientID;
@@ -902,7 +902,7 @@ bool CGameContext::DisconnectZombie(int ClientID)
 
 void CGameContext::OnClientConnected(int ClientID, bool Dummy)
 {
-    if(ClientID >= 4)
+    if(ClientID >= g_Config.m_SvPlayerSlots)
         return;
 
     if(!m_pController->GetWaveHandler()->GetWave())//let the round start
