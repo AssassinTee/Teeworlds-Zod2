@@ -610,7 +610,7 @@ void CGameContext::OnTick()
 				for(int i = 0; i < g_Config.m_SvPlayerSlots; i++)
 					if(m_apPlayers[i])
 						Server()->GetClientAddr(i, aaBuf[i], NETADDR_MAXSTRSIZE);
-				bool aVoteChecked[g_Config.m_SvPlayerSlots] = {0};
+				bool aVoteChecked[MAX_CLIENTS] = {0};
 				for(int i = 0; i < g_Config.m_SvPlayerSlots; i++)
 				{
 					if(!m_apPlayers[i] || m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS || aVoteChecked[i])	// don't count in votes by spectators
