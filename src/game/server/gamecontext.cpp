@@ -279,7 +279,7 @@ void CGameContext::SendCommand(int ChatterClientID, const std::string& command)
         messageList.push_back("You like it? Give me a Star on GitHub!");
         messageList.push_back("https://github.com/AssassinTee/Teeworlds-Zod2");
         std::stringstream ss;
-        ss << "Teeworlds version: '" << GAME_RELEASE_VERSION << "'";
+        ss << "Teeworlds version: '" << GAME_RELEASE_VERSION << "', ZoD Version: '" << ZOD_VERSION << "'";
         messageList.push_back(ss.str());
     }
     else if(command == "top5")
