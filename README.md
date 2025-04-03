@@ -8,6 +8,10 @@
 [![HitCount](http://hits.dwyl.io/AssassinTee/Teeworlds-Zod2.svg)](http://hits.dwyl.io/AssassinTee/Teeworlds-Zod2)
 > _"HITS - How Idiots Track Success"_
 
+## Attention
+
+Archived as of 2025!
+
 ## Description
 Zod is a Zombie-Mod for the retro-multiplayergame [Teeworlds](www.teeworlds.com).
 It is written for Teeworlds 0.7 and supports 60 zombies and 4 players at once.
